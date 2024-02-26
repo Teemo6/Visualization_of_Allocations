@@ -1,0 +1,58 @@
+{
+  "name": "java-memory-analyzer",
+  "displayName": "Memory Analyzer for Java",
+  "description": "Visualization tool for Java memory allocations",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.86.0"
+  },
+  "categories": [
+    "Debuggers"
+  ],
+  "icon": "icons/icon.png",
+  "author": "Štěpán Faragula",
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "extensionDependencies": [
+    "redhat.java"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "java-memory-analyzer.runAnalyzer",
+        "title": "Memory Analyzer: Analyze JAR file"
+      },
+      {
+        "command": "java-memory-analyzer.loadFile",
+        "title": "Memory Analyzer: Load JSON file"
+      },
+      {
+        "command": "java-memory-analyzer.stopShowing",
+        "title": "Memory Analyzer: Hide data"
+      },
+      {
+        "command": "java-memory-analyzer.startShowing",
+        "title": "Memory Analyzer: Show data"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.86.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@typescript-eslint/eslint-plugin": "^6.19.1",
+    "@typescript-eslint/parser": "^6.19.1",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3",
+    "@vscode/test-cli": "^0.0.4",
+    "@vscode/test-electron": "^2.3.9"
+  }
+}
