@@ -3,18 +3,18 @@ import * as vscode from 'vscode';
 import { ExtensionManager } from './ExtensionManager';
 
 export function activate(context: vscode.ExtensionContext): void {
-    console.log("Plugin activated");
-
     // Persistent object
     const manager: ExtensionManager = new ExtensionManager();
 
     // Command actions
-
     // Run Memory Analyzer and load JSON file
-    let runAnalyzer = vscode.commands.registerCommand('java-memory-analyzer.runAnalyzer', manager.loadFile.bind(manager));
+    let runAnalyzer = vscode.commands.registerCommand('java-memory-analyzer.runAnalyzer', manager.runAnalyzer.bind(manager));
 
     // Only load JSON file
     let loadFile = vscode.commands.registerCommand('java-memory-analyzer.loadFile', manager.loadFile.bind(manager));
+
+    // Only load JSON file
+    let showDetail = vscode.commands.registerCommand('java-memory-analyzer.showDetail', manager.showDetail.bind(manager));
 
     // Stop showing allocation data
     let stopShowing = vscode.commands.registerCommand('java-memory-analyzer.stopShowing', manager.stopShowingData.bind(manager));
@@ -29,6 +29,7 @@ export function activate(context: vscode.ExtensionContext): void {
     // Command actions
     context.subscriptions.push(runAnalyzer);
     context.subscriptions.push(loadFile);
+    context.subscriptions.push(showDetail);
     context.subscriptions.push(stopShowing);
     context.subscriptions.push(startShowing);
 

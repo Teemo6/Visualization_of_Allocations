@@ -1,3 +1,4 @@
+import { DuplicateRecord } from "./DuplicateRecord";
 import { AllocationKind } from "./AllocationKind";
 
 export class AllocationRecord {
@@ -6,6 +7,7 @@ export class AllocationRecord {
     public size: number = 0;
     public count: number = 1;
     public kind: AllocationKind;
+    public duplicates: DuplicateRecord[] = [];
 
     constructor(name: string, line: number, kind: AllocationKind) {
         this.name = name;

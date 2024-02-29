@@ -1,11 +1,49 @@
 import * as vscode from 'vscode';
 
 import { ClassRecord } from '../model/ClassRecord';
+import { AllocationJSON, isAllocationJSON } from './AllocationJSON';
+import { Constants } from '../Constants';
 
 export class Loader {
-    // Key = package.class
-    // Value = class data
-    private classFileMap: Map<string, ClassRecord> = new Map();
+    private loadedJSON: AllocationJSON | undefined = undefined;
+    private classFileMap: Map<string, ClassRecord> = new Map();     // Map <"package.class", symbols in class>
+
+    public async loadJSONFile(): Promise<boolean> {
+        this.loadedJSON = undefined;
+
+        try {
+            let path: vscode.Uri = vscode.Uri.file("");
+            var invalid = true;
+            await vscode.window.showOpenDialog({
+                canSelectMany: false,
+                filters: { "JSON file": ["json"] },
+            }).then(uri => {
+                if (uri && uri[0]) {
+                    path = uri[0];
+                    invalid = false;
+                }
+            });
+            if (invalid) {
+                vscode.window.showErrorMessage("Invalid file provided");
+                return false;
+            }
+            var rawData = await vscode.workspace.fs.readFile(path);
+            this.loadedJSON = await JSON.parse(rawData.toString());
+        } catch (error) {
+            vscode.window.showErrorMessage("Could not read JSON data");
+            return false;
+        }
+
+        if (!isAllocationJSON(this.loadedJSON)) {
+            vscode.window.showErrorMessage("JSON file has unexpected format");
+            return false;
+        }
+        return true;
+    }
+
+    public getAllocationJSON(): AllocationJSON | undefined {
+        return this.loadedJSON;
+    }
 
     public async loadProject(): Promise<boolean> {
         // Clear previous data
@@ -21,6 +59,17 @@ export class Loader {
         let files: vscode.Uri[] = await vscode.workspace.findFiles("**/*.java");
         if (files.length === 0) {
             vscode.window.showErrorMessage("No Java files found in workspace");
+            return false;
+        }
+
+        // Check if LSP is active
+        var LSP = vscode.extensions.getExtension(Constants.LSP_EXTENSION);
+        if (!LSP) {
+            vscode.window.showErrorMessage("Language support for Java is not present");
+            return false;
+        }
+        if (!LSP.isActive) {
+            vscode.window.showErrorMessage("Language support for Java is not ready yet, try again later");
             return false;
         }
 
@@ -55,7 +104,6 @@ export class Loader {
                         if (child.kind === vscode.SymbolKind.Constructor) {
                             var childDeclared = this.findDeclarationLine(child, document, symbol.name + "\\s*\\(");
                             classConstructors.push({ name: child.name, range: child.range, declared: childDeclared });
-                            console.log("Constructor " + child.name + " declared at " + childDeclared);
                         }
 
                         // Found method
@@ -63,11 +111,9 @@ export class Loader {
                             var rawName = child.name.substring(0, child.name.indexOf("("));
                             var childDeclared = this.findDeclarationLine(child, document, rawName + "\\s*\\(");
                             classMethods.push({ name: child.name, range: child.range, declared: childDeclared });
-                            console.log("Method " + child.name + " declared at " + childDeclared);
                         }
                     }
                     fileClasses.push({ name: className, range: classRange, declared: classDeclared, methods: classMethods, constructors: classConstructors });
-                    console.log("Class " + className + " declared at " + classDeclared);
                 }
 
                 // Symbol is a package
@@ -84,6 +130,12 @@ export class Loader {
                 }
             });
         }
+
+        if (this.classFileMap.size === 0) {
+            vscode.window.showErrorMessage("Could not find any Java symbols");
+            return false;
+        }
+
         return true;
     }
 

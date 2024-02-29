@@ -27,6 +27,10 @@
         "title": "Memory Analyzer: Load JSON file"
       },
       {
+        "command": "java-memory-analyzer.showDetail",
+        "title": "Memory Analyzer: Show line details"
+      },
+      {
         "command": "java-memory-analyzer.stopShowing",
         "title": "Memory Analyzer: Hide data"
       },
@@ -34,7 +38,59 @@
         "command": "java-memory-analyzer.startShowing",
         "title": "Memory Analyzer: Show data"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "java-memory-analyzer.showDetail"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Memory Analyzer",
+      "properties": {
+        "java-memory-analyzer.LINE_ALLOCATION_BACKGROUND": {
+          "type": "string",
+          "default": "rgba(200, 150, 0, 0.2)",
+          "description": "Background color of line allocation"
+        },
+        "java-memory-analyzer.LINE_ALLOCATION_TEXT": {
+          "type": "string",
+          "default": "rgba(200, 150, 0, 0.8)",
+          "description": "Text color of line allocation"
+        },
+        "java-memory-analyzer.METHOD_ALLOCATION_BACKGROUND": {
+          "type": "string",
+          "default": "rgba(200, 100, 0, 0.2)",
+          "description": "Background color of method allocation"
+        },
+        "java-memory-analyzer.METHOD_ALLOCATION_TEXT": {
+          "type": "string",
+          "default": "rgba(200, 100, 0, 0.8)",
+          "description": "Text color of method allocation"
+        },
+        "java-memory-analyzer.CLASS_ALLOCATION_BACKGROUND": {
+          "type": "string",
+          "default": "rgba(200, 50, 0, 0.2)",
+          "description": "Background color of class allocation"
+        },
+        "java-memory-analyzer.CLASS_ALLOCATION_TEXT": {
+          "type": "string",
+          "default": "rgba(200, 50, 0, 0.8)",
+          "description": "Text color of class allocation"
+        },
+        "java-memory-analyzer.NO_ALLOCATION_BACKGROUND": {
+          "type": "string",
+          "default": "rgba(150, 150, 150, 0.2)",
+          "description": "Background color of no allocation"
+        },
+        "java-memory-analyzer.NO_ALLOCATION_TEXT": {
+          "type": "string",
+          "default": "rgba(150, 150, 150, 0.6)",
+          "description": "Text color of no allocation"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
