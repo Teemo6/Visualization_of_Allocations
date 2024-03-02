@@ -15,24 +15,24 @@ export class Highlighter {
     private createAllocationText(size: number, count: number, duplicates: number, kind: AllocationKind): vscode.TextEditorDecorationType {
         var bgColor, gutterPath, textColor;
         if (size === 0) {
-            bgColor = Constants.CONFIGURATION.NO_ALLOCATION_BACKGROUND;
-            textColor = Constants.CONFIGURATION.NO_ALLOCATION_TEXT;
+            bgColor = Constants.COLOR_CONFIG.get<string>("emptyBackground");
+            textColor = Constants.COLOR_CONFIG.get<string>("emptyText");
             gutterPath = Constants.NO_ALLOCATION_GUTTER;
         } else if (kind === AllocationKind.LINE) {
-            bgColor = Constants.CONFIGURATION.LINE_ALLOCATION_BACKGROUND;
-            textColor = Constants.CONFIGURATION.LINE_ALLOCATION_TEXT;
+            bgColor = Constants.COLOR_CONFIG.get<string>("lineBackground");
+            textColor = Constants.COLOR_CONFIG.get<string>("lineText");
             gutterPath = Constants.LINE_ALLOCATION_GUTTER;
         } else if (kind === AllocationKind.METHOD) {
-            bgColor = Constants.CONFIGURATION.METHOD_ALLOCATION_BACKGROUND;
-            textColor = Constants.CONFIGURATION.METHOD_ALLOCATION_TEXT;
+            bgColor = Constants.COLOR_CONFIG.get<string>("methodBackground");
+            textColor = Constants.COLOR_CONFIG.get<string>("methodText");
             gutterPath = Constants.METHOD_ALLOCATION_GUTTER;
         } else {
-            bgColor = Constants.CONFIGURATION.CLASS_ALLOCATION_BACKGROUND;
-            textColor = Constants.CONFIGURATION.CLASS_ALLOCATION_TEXT;
+            bgColor = Constants.COLOR_CONFIG.get<string>("classBackground");
+            textColor = Constants.COLOR_CONFIG.get<string>("classText");
             gutterPath = Constants.CLASS_ALLOCATION_GUTTER;
         }
 
-        var text = " Allocated " + Intl.NumberFormat(Constants.NUMBER_LOCALE).format(size * count) + " Bytes";
+        var text = " Allocated " + Intl.NumberFormat(Constants.NUMBER_LOCALE).format(size) + " Bytes";
         if (count !== 1) {
             text += " in " + count + " instances";
         }
@@ -109,22 +109,48 @@ export class Highlighter {
         }
     }
 
-    public loadAllFileData(fileAllocationMap: Map<vscode.Uri, AllocationRecord[]>): void {
+    public loadAllFileData(fileAllocationMap: Map<string, AllocationRecord[]>): void {
         this.stopShowingData();
         this.highlightMap.clear();
 
         fileAllocationMap.forEach((data, file) => {
-            let highlights: HighlightData[] = [];
-            data.forEach(record => {
+            // Group data by line
+            let lineMap: Map<number, {size: number, count: number, dupes: number, kind: AllocationKind}[]> = new Map();
+            data.forEach(r => {
                 var dupeCount = 0;
-                record.duplicates.forEach(d => {
+                r.duplicates.forEach(d => {
                     dupeCount += d.duplicates;
                 });
-                var decorator = this.createAllocationText(record.size, record.count, dupeCount, record.kind);
-                var range = [new vscode.Range(new vscode.Position(record.line, 0), new vscode.Position(record.line, 0))];
-                highlights.push(new HighlightData(decorator, range, record.kind));
+
+                var val = {size: r.size, count: r.count, dupes: dupeCount, kind: r.kind};
+                if (lineMap.has(r.line)) {
+                    lineMap.get(r.line)!.push(val);
+                } else {
+                    lineMap.set(r.line, [val]);
+                }
             });
-            this.highlightMap.set(file.path, highlights);
+
+            // Aggregate all data on line
+            let highlights: HighlightData[] = [];
+            for (var [line, arr] of lineMap){
+                let allocSize: number = 0;
+                let allocCount: number = 0;
+                let dupeCount: number = 0;
+                let recordKind: AllocationKind = AllocationKind.LINE;
+
+                for (var val of arr){
+                    allocSize += val.size * val.count;
+                    allocCount += val.count;
+                    dupeCount += val.dupes;
+                    recordKind = val.kind;
+                }
+
+                var decorator = this.createAllocationText(allocSize, allocCount, dupeCount, recordKind);
+                var range = [new vscode.Range(new vscode.Position(line, 0), new vscode.Position(line, 0))];
+                highlights.push(new HighlightData(decorator, range, recordKind));
+            }
+
+            this.highlightMap.set(file, highlights);
         });
     }
 }

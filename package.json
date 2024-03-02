@@ -1,6 +1,6 @@
 {
   "name": "java-memory-analyzer",
-  "displayName": "Memory Analyzer for Java",
+  "displayName": "Java Memory Analyzer",
   "description": "Visualization tool for Java memory allocations",
   "version": "0.0.1",
   "engines": {
@@ -49,45 +49,45 @@
     "configuration": {
       "title": "Memory Analyzer",
       "properties": {
-        "java-memory-analyzer.LINE_ALLOCATION_BACKGROUND": {
+        "java-memory-analyzer.color.lineBackground": {
           "type": "string",
           "default": "rgba(200, 150, 0, 0.2)",
           "description": "Background color of line allocation"
         },
-        "java-memory-analyzer.LINE_ALLOCATION_TEXT": {
+        "java-memory-analyzer.color.lineText": {
           "type": "string",
           "default": "rgba(200, 150, 0, 0.8)",
           "description": "Text color of line allocation"
         },
-        "java-memory-analyzer.METHOD_ALLOCATION_BACKGROUND": {
+        "java-memory-analyzer.color.methodBackground": {
           "type": "string",
           "default": "rgba(200, 100, 0, 0.2)",
           "description": "Background color of method allocation"
         },
-        "java-memory-analyzer.METHOD_ALLOCATION_TEXT": {
+        "java-memory-analyzer.color.methodText": {
           "type": "string",
           "default": "rgba(200, 100, 0, 0.8)",
           "description": "Text color of method allocation"
         },
-        "java-memory-analyzer.CLASS_ALLOCATION_BACKGROUND": {
+        "java-memory-analyzer.color.classBackground": {
           "type": "string",
           "default": "rgba(200, 50, 0, 0.2)",
           "description": "Background color of class allocation"
         },
-        "java-memory-analyzer.CLASS_ALLOCATION_TEXT": {
+        "java-memory-analyzer.color.classText": {
           "type": "string",
           "default": "rgba(200, 50, 0, 0.8)",
           "description": "Text color of class allocation"
         },
-        "java-memory-analyzer.NO_ALLOCATION_BACKGROUND": {
+        "java-memory-analyzer.color.emptyBackground": {
           "type": "string",
           "default": "rgba(150, 150, 150, 0.2)",
-          "description": "Background color of no allocation"
+          "description": "Background color of no allocation for method / class"
         },
-        "java-memory-analyzer.NO_ALLOCATION_TEXT": {
+        "java-memory-analyzer.color.emptyText": {
           "type": "string",
           "default": "rgba(150, 150, 150, 0.6)",
-          "description": "Text color of no allocation"
+          "description": "Text color of no allocation for method / class"
         }
       }
     }

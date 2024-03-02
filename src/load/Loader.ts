@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { ClassRecord } from '../model/ClassRecord';
-import { AllocationJSON, isAllocationJSON } from './AllocationJSON';
+import { AllocationJSON, createAllocationJSON } from './AllocationJSON';
 import { Constants } from '../Constants';
 
 export class Loader {
@@ -34,7 +34,8 @@ export class Loader {
             return false;
         }
 
-        if (!isAllocationJSON(this.loadedJSON)) {
+        this.loadedJSON = createAllocationJSON(this.loadedJSON);
+        if (!this.loadedJSON) {
             vscode.window.showErrorMessage("JSON file has unexpected format");
             return false;
         }
@@ -124,9 +125,9 @@ export class Loader {
 
             fileClasses.forEach(c => {
                 if (!filePackage) {
-                    this.classFileMap.set(c.name, new ClassRecord(file, filePackage, c.name, c.range, c.declared, c.methods, c.constructors));
+                    this.classFileMap.set(c.name, new ClassRecord(file.path, filePackage, c.name, c.range, c.declared, c.methods, c.constructors));
                 } else {
-                    this.classFileMap.set(filePackage + "." + c.name, new ClassRecord(file, filePackage, c.name, c.range, c.declared, c.methods, c.constructors));
+                    this.classFileMap.set(filePackage + "." + c.name, new ClassRecord(file.path, filePackage, c.name, c.range, c.declared, c.methods, c.constructors));
                 }
             });
         }

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import path from 'path';
 
 export class Constants {
-    public static CONFIGURATION = vscode.workspace.getConfiguration("java-memory-analyzer");
+    public static COLOR_CONFIG = vscode.workspace.getConfiguration("java-memory-analyzer.color");
 
     public static LSP_EXTENSION: string = "redhat.java";
 

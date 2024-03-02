@@ -19,7 +19,7 @@ suite('Allocation JSON', () => {
             return;
         }
 
-        assert.equal(true, json.isAllocationJSON(jsonData));
+        assert.equal(true, json.createAllocationJSON(jsonData));
     });
 
     test('Valid empty JSON', async () => {
@@ -33,7 +33,7 @@ suite('Allocation JSON', () => {
             return;
         }
 
-        assert.equal(true, json.isAllocationJSON(jsonData));
+        assert.equal(true, json.createAllocationJSON(jsonData));
     });
 
     test('Invalid key JSON', async () => {
@@ -47,7 +47,7 @@ suite('Allocation JSON', () => {
             return;
         }
 
-        assert.equal(false, json.isAllocationJSON(jsonData));
+        assert.equal(false, json.createAllocationJSON(jsonData));
     });
 
     test('Invalid value JSON', async () => {
@@ -61,7 +61,7 @@ suite('Allocation JSON', () => {
             return;
         }
 
-        assert.equal(false, json.isAllocationJSON(jsonData));
+        assert.equal(false, json.createAllocationJSON(jsonData));
     });
 
     test('Invalid missing line JSON', async () => {
@@ -75,7 +75,7 @@ suite('Allocation JSON', () => {
             return;
         }
 
-        assert.equal(false, json.isAllocationJSON(jsonData));
+        assert.equal(false, json.createAllocationJSON(jsonData));
     });
 
     test('Invalid missing method JSON', async () => {
@@ -89,7 +89,7 @@ suite('Allocation JSON', () => {
             return;
         }
 
-        assert.equal(false, json.isAllocationJSON(jsonData));
+        assert.equal(false, json.createAllocationJSON(jsonData));
     });
 
     test('Invalid missing class JSON', async () => {
@@ -103,7 +103,7 @@ suite('Allocation JSON', () => {
             return;
         }
 
-        assert.equal(false, json.isAllocationJSON(jsonData));
+        assert.equal(false, json.createAllocationJSON(jsonData));
     });
 
     test('Invalid missing duplicate JSON', async () => {
@@ -117,7 +117,7 @@ suite('Allocation JSON', () => {
             return;
         }
 
-        assert.equal(false, json.isAllocationJSON(jsonData));
+        assert.equal(false, json.createAllocationJSON(jsonData));
     });
 
     test('Invalid JSON', async () => {
@@ -131,6 +131,6 @@ suite('Allocation JSON', () => {
             return;
         }
 
-        assert.equal(false, json.isAllocationJSON(jsonData));
+        assert.equal(false, json.createAllocationJSON(jsonData));
     });
 });

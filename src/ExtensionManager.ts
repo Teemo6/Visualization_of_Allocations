@@ -7,14 +7,21 @@ import { AllocationRecord } from './model/AllocationRecord';
 import { ClassRecord } from './model/ClassRecord';
 import { AllocationKind } from './model/AllocationKind';
 import { DuplicateRecord } from './model/DuplicateRecord';
+import { AllocationJSON } from './load/AllocationJSON';
 
 export class ExtensionManager {
-    private loader: Loader = new Loader;
-    private highlighter: Highlighter = new Highlighter;
+    private readonly extensionUri: vscode.Uri;
 
-    private loadedJSON: any;
-    private classFileMap: Map<string, ClassRecord> = new Map();                     // Map <"package.class", symbols in class>
-    private allocationFileMap: Map<vscode.Uri, AllocationRecord[]> = new Map();     // Map <file path, all line data>
+    private readonly loader: Loader = new Loader;
+    private readonly highlighter: Highlighter = new Highlighter;
+
+    private loadedJSON: AllocationJSON | undefined = undefined;                     // JSON data => got from Loader JSON file
+    private classFileMap: Map<string, ClassRecord> = new Map();                     // Map <"package.class", symbols in class> => got from Loader Java symbols
+    private allocationFileMap: Map<string, AllocationRecord[]> = new Map();         // Map <file path, all line data> => created mapping between JSON an Java symbols
+
+    constructor(extensionUri: vscode.Uri) {
+        this.extensionUri = extensionUri;
+    }
 
     public async runAnalyzer(): Promise<void> {
         vscode.window.setStatusBarMessage("Running analyzer");
@@ -46,9 +53,11 @@ export class ExtensionManager {
         this.classFileMap = this.loader.getFileMap();
         this.allocationFileMap = new Map();
 
-
         // Map symbols and JSON file
         if (!await this.mapSymbolsAndJSON()) {
+            this.loadedJSON = undefined;
+            this.classFileMap = new Map();
+            this.allocationFileMap = new Map();
             return;
         }
 
@@ -60,7 +69,111 @@ export class ExtensionManager {
     }
 
     public async showDetail(): Promise<void> {
+        vscode.window.setStatusBarMessage("Showing line details");
 
+        let editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            vscode.window.showErrorMessage('No active editor');
+        }
+
+        // Select active line
+        let activeLine = editor!.selection.active.line;
+        let records = this.allocationFileMap.get(editor!.document.uri.path);
+        if (!records) {
+            vscode.window.showErrorMessage('Nothing to show');
+            return;
+        }
+
+        let lineRecords: AllocationRecord[] = [];
+        for (var r of records!) {
+            if (r.kind === AllocationKind.LINE && r.line === activeLine) {
+                lineRecords.push(r);
+                console.log(r);
+            }
+        }
+
+        // Webview
+        let panel = vscode.window.createWebviewPanel("analyzerView", "Memory Analyzer", vscode.ViewColumn.Two, {
+            enableScripts: true,
+            localResourceRoots: [this.extensionUri]
+        });
+        panel.webview.html = this.getHTML(panel.webview);
+
+        // Send data to webview
+        panel.webview.postMessage(
+            {
+                type: 'data',
+                line: activeLine,
+                allocData: [
+                    { name: 'int[]', size: 75 , count: 4},
+                    { name: 'TestingObject', size: 75 , count: 4},
+                    { name: 'int[]', size: 75 , count: 4},
+                    { name: 'TestingObject', size: 75 , count: 4},
+                ],
+                dupeData: [
+                    { name: 'int[]', size: 75 , count: 4, source: "package.Main:44"},
+                    { name: 'TestingObject', size: 75 , count: 4, source: "package.Main:44"},
+                    { name: 'int[]', size: 75 , count: 4, source: "package.Main:44"},
+                    { name: 'TestingObject', size: 75 , count: 4, source: "package.Main:44"},
+                ]
+            }
+        );
+
+        vscode.window.setStatusBarMessage("Done showing line details");
+    }
+
+    private getHTML(webview: vscode.Webview) {
+        let scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "webview", "main.js"));
+        let cssUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "webview", "main.css"));
+
+        // Run only scripts secured by random nonce
+        let nonce = "";
+        let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        for (let i = 0; i < 32; i++) {
+            nonce += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+
+        return `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                
+                <link href="${cssUri}" rel="stylesheet">
+                
+                <title>Memory Analyzer</title>
+            </head>
+            <body>
+                <h3 id="alloc-header"></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Size&nbsp;[B]</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alloc-table"></tbody>
+                </table>
+
+                <h3 id="dupe-header">Duplicates</h3>
+                <table>
+                    <thead>
+                        <tr>                            
+                            <th>Name</th>
+                            <th>Size&nbsp;[B]</th>
+                            <th>Count</th>
+                            <th>Source</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dupe-table"></tbody>
+                </table>
+
+                <script nonce="${nonce}" src="${scriptUri}"></script>
+            </body>
+            </html>`;
     }
 
     public stopShowingData(): void {
@@ -77,12 +190,20 @@ export class ExtensionManager {
         this.highlighter.highlightEditors();
     }
 
+    // TODO: config live color update
+    public updateConfig(): void {
+        console.log("Updated config");
+    }
+
     private async mapSymbolsAndJSON(): Promise<boolean> {
+        if (!this.loadedJSON) {
+            return false;
+        }
 
         // Load line allocation data
         for (var l of this.loadedJSON.LINE) {
             // Editor is indexing from 0
-            var editorLine = l.line - 1;   
+            var editorLine = l.line - 1;
 
             // Anonymous call, trim it
             if (l.class.endsWith("$1")) {
@@ -138,24 +259,27 @@ export class ExtensionManager {
 
         // Load instance duplicate data
         for (var d of this.loadedJSON.DUPLICATE) {
-            // Editor is indexing from 0
-            var editorLine = d.line - 1;   
+            // Load every trace
+            for (var t of d.traces) {
+                // Editor is indexing from 0
+                var editorLine = t.line - 1;
 
-            // Anonymous call, rename it
-            if (d.class.endsWith("$1")) {
-                d.class = d.class.substring(0, d.class.indexOf("$1"));
-            }
+                // Anonymous call, rename it
+                if (t.class.endsWith("$1")) {
+                    t.class = t.class.substring(0, t.class.indexOf("$1"));
+                }
 
-            // Find JSON class in workspace symbols
-            if (this.classFileMap.has(d.class)) {
-                // Get file by URI, convert line to document position, compare with class range
-                var classFile = this.classFileMap.get(d.class)!.file;
-                let duplicate: DuplicateRecord = new DuplicateRecord(d.size, d.duplicates);
+                // Find JSON class in workspace symbols
+                if (this.classFileMap.has(t.class)) {
+                    // Get file by URI, convert line to document position, compare with class range
+                    var classFile = this.classFileMap.get(t.class)!.file;
+                    let duplicate: DuplicateRecord = new DuplicateRecord(d.size, d.duplicates);
 
-                for (var alloc of this.allocationFileMap.get(classFile)!) {
-                    if (alloc.line === editorLine) {
-                        alloc.duplicates.push(duplicate);
-                        break;
+                    for (var alloc of this.allocationFileMap.get(classFile)!) {
+                        if (alloc.line === editorLine && alloc.name === d.name && alloc.size === d.size) {
+                            alloc.duplicates.push(duplicate);
+                            break;
+                        }
                     }
                 }
             }

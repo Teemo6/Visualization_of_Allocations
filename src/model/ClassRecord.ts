@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { MethodRecord } from './MethodRecord';
 
 export class ClassRecord {
-    public file: vscode.Uri;
+    public file: string;
     public package: string;
     public name: string;
     public range: vscode.Range;
@@ -12,7 +12,7 @@ export class ClassRecord {
     public methods: MethodRecord[] = [];
     public allocated: number = 0;
 
-    constructor(file: vscode.Uri, packag: string, name: string, range: vscode.Range, declared: number, methods: { name: string, range: vscode.Range, declared: number }[], constructors: { name: string, range: vscode.Range, declared: number }[]) {
+    constructor(file: string, packag: string, name: string, range: vscode.Range, declared: number, methods: { name: string, range: vscode.Range, declared: number }[], constructors: { name: string, range: vscode.Range, declared: number }[]) {
         this.file = file;
         this.package = packag;
         this.name = name;

@@ -4,7 +4,7 @@ import { ExtensionManager } from './ExtensionManager';
 
 export function activate(context: vscode.ExtensionContext): void {
     // Persistent object
-    const manager: ExtensionManager = new ExtensionManager();
+    const manager: ExtensionManager = new ExtensionManager(context.extensionUri);
 
     // Command actions
     // Run Memory Analyzer and load JSON file
@@ -26,6 +26,9 @@ export function activate(context: vscode.ExtensionContext): void {
     // Load highlight on editor activation
     let highlightLines = vscode.window.onDidChangeVisibleTextEditors(manager.highlightEditors.bind(manager));
 
+    // Update highlight colors upon editing configuration
+    let updateConfig = vscode.workspace.onDidChangeConfiguration(manager.updateConfig.bind(manager));
+
     // Command actions
     context.subscriptions.push(runAnalyzer);
     context.subscriptions.push(loadFile);
@@ -35,4 +38,5 @@ export function activate(context: vscode.ExtensionContext): void {
 
     // Event actions
     context.subscriptions.push(highlightLines);
+    context.subscriptions.push(updateConfig);
 }
