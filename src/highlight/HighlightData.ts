@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { AllocationKind } from '../model/AllocationKind';
+import { AllocationKind } from '../model/json/AllocationKind';
 
 export class HighlightData {
     public decorator: vscode.TextEditorDecorationType;

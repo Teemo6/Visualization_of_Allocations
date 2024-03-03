@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
+import path from 'path';
 
-import { ClassRecord } from '../model/ClassRecord';
+import { ClassRecord } from '../model/lsp/ClassRecord';
 import { AllocationJSON, createAllocationJSON } from './AllocationJSON';
 import { Constants } from '../Constants';
 
@@ -12,25 +13,27 @@ export class Loader {
         this.loadedJSON = undefined;
 
         try {
-            let path: vscode.Uri = vscode.Uri.file("");
-            var invalid = true;
-            await vscode.window.showOpenDialog({
-                canSelectMany: false,
-                filters: { "JSON file": ["json"] },
-            }).then(uri => {
-                if (uri && uri[0]) {
-                    path = uri[0];
-                    invalid = false;
-                }
-            });
-            if (invalid) {
-                vscode.window.showErrorMessage("Invalid file provided");
-                return false;
+            let jsonPath: vscode.Uri = vscode.Uri.file("");
+            let userDefined = Constants.JSON_CONFIG.get<string>("defaultPath");
+            if (userDefined) {
+                jsonPath = vscode.Uri.parse("file:/" + userDefined);
+                vscode.window.showInformationMessage("Memory Analyzer: Loading " + jsonPath.path);
+            } else {
+                await vscode.window.showOpenDialog({
+                    canSelectMany: false,
+                    filters: { "JSON file": ["json"] },
+                }).then(uri => {
+                    if (uri && uri[0]) {
+                        jsonPath = uri[0];
+                    } else {
+                        return false;
+                    }
+                });
             }
-            var rawData = await vscode.workspace.fs.readFile(path);
+            var rawData = await vscode.workspace.fs.readFile(jsonPath);
             this.loadedJSON = await JSON.parse(rawData.toString());
         } catch (error) {
-            vscode.window.showErrorMessage("Could not read JSON data");
+            vscode.window.showErrorMessage("Memory Analyzer: Could not read JSON data");
             return false;
         }
 

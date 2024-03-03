@@ -2,8 +2,8 @@ import * as vscode from 'vscode';
 
 import { HighlightData } from './HighlightData';
 import { Constants } from '../Constants';
-import { AllocationRecord } from '../model/AllocationRecord';
-import { AllocationKind } from '../model/AllocationKind';
+import { AllocationRecord } from '../model/json/AllocationRecord';
+import { AllocationKind } from '../model/json/AllocationKind';
 
 export class Highlighter {
     // Key = file path
@@ -117,12 +117,7 @@ export class Highlighter {
             // Group data by line
             let lineMap: Map<number, {size: number, count: number, dupes: number, kind: AllocationKind}[]> = new Map();
             data.forEach(r => {
-                var dupeCount = 0;
-                r.duplicates.forEach(d => {
-                    dupeCount += d.duplicates;
-                });
-
-                var val = {size: r.size, count: r.count, dupes: dupeCount, kind: r.kind};
+                var val = {size: r.size, count: r.count, dupes: r.dupeCount, kind: r.kind};
                 if (lineMap.has(r.line)) {
                     lineMap.get(r.line)!.push(val);
                 } else {

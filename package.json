@@ -49,6 +49,11 @@
     "configuration": {
       "title": "Memory Analyzer",
       "properties": {
+        "java-memory-analyzer.json.defaultPath": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to JSON file, leave empty to always ask"
+        },
         "java-memory-analyzer.color.lineBackground": {
           "type": "string",
           "default": "rgba(200, 150, 0, 0.2)",

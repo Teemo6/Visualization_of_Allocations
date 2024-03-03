@@ -3,11 +3,11 @@ import * as vscode from 'vscode';
 import { Loader } from './load/Loader';
 import { Highlighter } from './highlight/Highlighter';
 import { Constants } from './Constants';
-import { AllocationRecord } from './model/AllocationRecord';
-import { ClassRecord } from './model/ClassRecord';
-import { AllocationKind } from './model/AllocationKind';
-import { DuplicateRecord } from './model/DuplicateRecord';
+import { AllocationRecord } from './model/json/AllocationRecord';
+import { ClassRecord } from './model/lsp/ClassRecord';
+import { AllocationKind } from './model/json/AllocationKind';
 import { AllocationJSON } from './load/AllocationJSON';
+import { DuplicateTrace } from './model/json/DuplicateTrace';
 
 export class ExtensionManager {
     private readonly extensionUri: vscode.Uri;
@@ -88,7 +88,6 @@ export class ExtensionManager {
         for (var r of records!) {
             if (r.kind === AllocationKind.LINE && r.line === activeLine) {
                 lineRecords.push(r);
-                console.log(r);
             }
         }
 
@@ -100,31 +99,34 @@ export class ExtensionManager {
         panel.webview.html = this.getHTML(panel.webview);
 
         // Send data to webview
-        panel.webview.postMessage(
-            {
+        if (lineRecords.length === 0 || lineRecords[0].kind !== AllocationKind.LINE) {
+            panel.webview.postMessage({ type: "noData", line: activeLine + 1 });
+        } else {
+            console.log(lineRecords);
+            let allocData: { name: string, size: number, count: number }[] = [];
+            let dupeData: { name: string, size: number, count: number, source: string }[] = [];
+
+            lineRecords.forEach(l => {
+                allocData.push({ name: l.name, size: l.size, count: l.count });
+                l.duplicates.forEach(t => {
+                    dupeData.push({ name: l.name, size: l.size, count: t.count, source: t.getJavaSource() });
+                });
+            });
+
+            panel.webview.postMessage({
                 type: 'data',
-                line: activeLine,
-                allocData: [
-                    { name: 'int[]', size: 75 , count: 4},
-                    { name: 'TestingObject', size: 75 , count: 4},
-                    { name: 'int[]', size: 75 , count: 4},
-                    { name: 'TestingObject', size: 75 , count: 4},
-                ],
-                dupeData: [
-                    { name: 'int[]', size: 75 , count: 4, source: "package.Main:44"},
-                    { name: 'TestingObject', size: 75 , count: 4, source: "package.Main:44"},
-                    { name: 'int[]', size: 75 , count: 4, source: "package.Main:44"},
-                    { name: 'TestingObject', size: 75 , count: 4, source: "package.Main:44"},
-                ]
-            }
-        );
+                line: activeLine + 1,
+                allocData: allocData,
+                dupeData: dupeData
+            });
+        }
 
         vscode.window.setStatusBarMessage("Done showing line details");
     }
 
     private getHTML(webview: vscode.Webview) {
-        let scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "webview", "main.js"));
-        let cssUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "webview", "main.css"));
+        let scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "src", "webview", "main.js"));
+        let cssUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "src", "webview", "main.css"));
 
         // Run only scripts secured by random nonce
         let nonce = "";
@@ -146,31 +148,8 @@ export class ExtensionManager {
                 <title>Memory Analyzer</title>
             </head>
             <body>
-                <h3 id="alloc-header"></h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Size&nbsp;[B]</th>
-                            <th>Count</th>
-                        </tr>
-                    </thead>
-                    <tbody id="alloc-table"></tbody>
-                </table>
-
-                <h3 id="dupe-header">Duplicates</h3>
-                <table>
-                    <thead>
-                        <tr>                            
-                            <th>Name</th>
-                            <th>Size&nbsp;[B]</th>
-                            <th>Count</th>
-                            <th>Source</th>
-                        </tr>
-                    </thead>
-                    <tbody id="dupe-table"></tbody>
-                </table>
-
+                <div id="alloc"></div>
+                <div id="dupe"></div>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
             </body>
             </html>`;
@@ -190,9 +169,8 @@ export class ExtensionManager {
         this.highlighter.highlightEditors();
     }
 
-    // TODO: config live color update
     public updateConfig(): void {
-        console.log("Updated config");
+        Constants.updateConfiguration();
     }
 
     private async mapSymbolsAndJSON(): Promise<boolean> {
@@ -259,27 +237,27 @@ export class ExtensionManager {
 
         // Load instance duplicate data
         for (var d of this.loadedJSON.DUPLICATE) {
-            // Load every trace
-            for (var t of d.traces) {
-                // Editor is indexing from 0
-                var editorLine = t.line - 1;
-
+            // Load every trace of duplicate
+            let allTraces: DuplicateTrace[] = [];
+            for (var rawTrace of d.traces) {
                 // Anonymous call, rename it
-                if (t.class.endsWith("$1")) {
-                    t.class = t.class.substring(0, t.class.indexOf("$1"));
+                if (rawTrace.class.endsWith("$1")) {
+                    rawTrace.class = rawTrace.class.substring(0, rawTrace.class.indexOf("$1"));
                 }
 
-                // Find JSON class in workspace symbols
-                if (this.classFileMap.has(t.class)) {
-                    // Get file by URI, convert line to document position, compare with class range
-                    var classFile = this.classFileMap.get(t.class)!.file;
-                    let duplicate: DuplicateRecord = new DuplicateRecord(d.size, d.duplicates);
+                // Map trace to Java file
+                if (this.classFileMap.has(rawTrace.class)) {
+                    let tracePath = this.classFileMap.get(rawTrace.class)!.file;
+                    allTraces.push(new DuplicateTrace(tracePath, rawTrace.class, rawTrace.method, rawTrace.line, rawTrace.count));
+                }
+            }
 
-                    for (var alloc of this.allocationFileMap.get(classFile)!) {
-                        if (alloc.line === editorLine && alloc.name === d.name && alloc.size === d.size) {
-                            alloc.duplicates.push(duplicate);
-                            break;
-                        }
+            // Add trace info to allocation record
+            for (var trace of allTraces) {
+                for (var alloc of this.allocationFileMap.get(trace.file)!) {
+                    if (alloc.kind === AllocationKind.LINE && alloc.line === trace.line - 1 && alloc.name === d.name && alloc.size === d.size) {
+                        alloc.dupeCount = d.duplicates;
+                        alloc.duplicates = allTraces;
                     }
                 }
             }

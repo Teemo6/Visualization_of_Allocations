@@ -2,9 +2,7 @@ body {
     font-size: 100%;
 }
 
-table,
-td,
-th {
+table, td, th {
     border: 1px solid;
     text-align: left;
 }
@@ -14,10 +12,8 @@ table {
     width: fit-content;
 }
 
-td,
-th {
+td, th {
     padding: 5px;
-    width: 25%;
 }
 
 th {
