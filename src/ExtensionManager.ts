@@ -8,19 +8,21 @@ import { ClassRecord } from './model/lsp/ClassRecord';
 import { AllocationKind } from './model/json/AllocationKind';
 import { AllocationJSON } from './load/AllocationJSON';
 import { DuplicateTrace } from './model/json/DuplicateTrace';
+import { WebviewTable } from './webview/WebviewTable';
 
 export class ExtensionManager {
-    private readonly extensionUri: vscode.Uri;
+    private readonly context: vscode.ExtensionContext;
 
     private readonly loader: Loader = new Loader;
     private readonly highlighter: Highlighter = new Highlighter;
+    public readonly webviewTable: WebviewTable = new WebviewTable;
 
     private loadedJSON: AllocationJSON | undefined = undefined;                     // JSON data => got from Loader JSON file
     private classFileMap: Map<string, ClassRecord> = new Map();                     // Map <"package.class", symbols in class> => got from Loader Java symbols
     private allocationFileMap: Map<string, AllocationRecord[]> = new Map();         // Map <file path, all line data> => created mapping between JSON an Java symbols
 
-    constructor(extensionUri: vscode.Uri) {
-        this.extensionUri = extensionUri;
+    constructor(context: vscode.ExtensionContext) {
+        this.context = context;
     }
 
     public async runAnalyzer(): Promise<void> {
@@ -71,40 +73,38 @@ export class ExtensionManager {
     public async showDetail(): Promise<void> {
         vscode.window.setStatusBarMessage("Showing line details");
 
-        let editor = vscode.window.activeTextEditor;
+        const editor = vscode.window.activeTextEditor;
         if (!editor) {
             vscode.window.showErrorMessage('No active editor');
         }
 
         // Select active line
-        let activeLine = editor!.selection.active.line;
-        let records = this.allocationFileMap.get(editor!.document.uri.path);
+        const activeLine = editor!.selection.active.line;
+        const records = this.allocationFileMap.get(editor!.document.uri.path);
         if (!records) {
             vscode.window.showErrorMessage('Nothing to show');
             return;
         }
 
-        let lineRecords: AllocationRecord[] = [];
-        for (var r of records!) {
+        const lineRecords: AllocationRecord[] = [];
+        for (const r of records!) {
             if (r.kind === AllocationKind.LINE && r.line === activeLine) {
                 lineRecords.push(r);
             }
         }
 
         // Webview
-        let panel = vscode.window.createWebviewPanel("analyzerView", "Memory Analyzer", vscode.ViewColumn.Two, {
-            enableScripts: true,
-            localResourceRoots: [this.extensionUri]
-        });
-        panel.webview.html = this.getHTML(panel.webview);
+        if (!this.webviewTable.hasActivePanel()) {
+            this.webviewTable.createNewPanel(this.context);
+        }
 
         // Send data to webview
         if (lineRecords.length === 0 || lineRecords[0].kind !== AllocationKind.LINE) {
-            panel.webview.postMessage({ type: "noData", line: activeLine + 1 });
+            this.webviewTable.sendNothingToTable(activeLine + 1);
         } else {
             console.log(lineRecords);
-            let allocData: { name: string, size: number, count: number }[] = [];
-            let dupeData: { name: string, size: number, count: number, source: string }[] = [];
+            const allocData: { name: string, size: number, count: number }[] = [];
+            const dupeData: { name: string, size: number, count: number, source: string }[] = [];
 
             lineRecords.forEach(l => {
                 allocData.push({ name: l.name, size: l.size, count: l.count });
@@ -112,47 +112,10 @@ export class ExtensionManager {
                     dupeData.push({ name: l.name, size: l.size, count: t.count, source: t.getJavaSource() });
                 });
             });
-
-            panel.webview.postMessage({
-                type: 'data',
-                line: activeLine + 1,
-                allocData: allocData,
-                dupeData: dupeData
-            });
+            this.webviewTable.sendDataToTable(activeLine + 1, allocData, dupeData);
         }
 
         vscode.window.setStatusBarMessage("Done showing line details");
-    }
-
-    private getHTML(webview: vscode.Webview) {
-        let scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "src", "webview", "main.js"));
-        let cssUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "src", "webview", "main.css"));
-
-        // Run only scripts secured by random nonce
-        let nonce = "";
-        let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        for (let i = 0; i < 32; i++) {
-            nonce += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-
-        return `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                
-                <link href="${cssUri}" rel="stylesheet">
-                
-                <title>Memory Analyzer</title>
-            </head>
-            <body>
-                <div id="alloc"></div>
-                <div id="dupe"></div>
-                <script nonce="${nonce}" src="${scriptUri}"></script>
-            </body>
-            </html>`;
     }
 
     public stopShowingData(): void {
@@ -179,9 +142,9 @@ export class ExtensionManager {
         }
 
         // Load line allocation data
-        for (var l of this.loadedJSON.LINE) {
+        for (const l of this.loadedJSON.LINE) {
             // Editor is indexing from 0
-            var editorLine = l.line - 1;
+            const editorLine = l.line - 1;
 
             // Anonymous call, trim it
             if (l.class.endsWith("$1")) {
@@ -191,37 +154,37 @@ export class ExtensionManager {
             // Find JSON class in workspace symbols
             if (this.classFileMap.has(l.class)) {
                 // Get file by URI, convert line to document position, compare with class range
-                var classRecord = this.classFileMap.get(l.class);
-                var document = await vscode.workspace.openTextDocument(classRecord!.file);
+                const classRecord = this.classFileMap.get(l.class);
+                const document = await vscode.workspace.openTextDocument(classRecord!.file);
                 if (document.lineCount < l.line) {
                     vscode.window.showErrorMessage("Allocation line " + l.class + ":" + l.line + " out of bound");
                     return false;
                 }
 
                 // Reduce line by offset
-                var lineRange = new vscode.Range(new vscode.Position(editorLine, 0), new vscode.Position(editorLine, 0));
-                var totalSize = l.size * l.count;
+                const lineRange = new vscode.Range(new vscode.Position(editorLine, 0), new vscode.Position(editorLine, 0));
+                const totalSize = l.size * l.count;
 
                 if (classRecord!.range.contains(lineRange)) {
                     classRecord!.allocated += totalSize;
 
                     // Find which constructor/method does the line fit in, ranges are sorted
                     if (l.method === Constants.LINE_CONSTRUCTOR_STRING) {
-                        for (var con of classRecord!.constructors) {
+                        for (const con of classRecord!.constructors) {
                             if (con.range.contains(lineRange)) {
                                 con.allocated += totalSize;
                                 break;
                             }
                         }
                     } else {
-                        for (var m of classRecord!.methods) {
+                        for (const m of classRecord!.methods) {
                             if (m.range.contains(lineRange) && m.name.substring(0, m.name.indexOf("(")) === l.method) {
                                 m.allocated += totalSize;
                                 break;
                             }
                         }
                     }
-                    let lineRecord: AllocationRecord = new AllocationRecord(l.name, editorLine, AllocationKind.LINE);
+                    const lineRecord: AllocationRecord = new AllocationRecord(l.name, editorLine, AllocationKind.LINE);
                     lineRecord.size = l.size;
                     lineRecord.count = l.count;
                     if (this.allocationFileMap.has(classRecord!.file)) {
@@ -236,10 +199,10 @@ export class ExtensionManager {
         }
 
         // Load instance duplicate data
-        for (var d of this.loadedJSON.DUPLICATE) {
+        for (const d of this.loadedJSON.DUPLICATE) {
             // Load every trace of duplicate
-            let allTraces: DuplicateTrace[] = [];
-            for (var rawTrace of d.traces) {
+            const allTraces: DuplicateTrace[] = [];
+            for (const rawTrace of d.traces) {
                 // Anonymous call, rename it
                 if (rawTrace.class.endsWith("$1")) {
                     rawTrace.class = rawTrace.class.substring(0, rawTrace.class.indexOf("$1"));
@@ -247,16 +210,16 @@ export class ExtensionManager {
 
                 // Map trace to Java file
                 if (this.classFileMap.has(rawTrace.class)) {
-                    let tracePath = this.classFileMap.get(rawTrace.class)!.file;
+                    const tracePath = this.classFileMap.get(rawTrace.class)!.file;
                     allTraces.push(new DuplicateTrace(tracePath, rawTrace.class, rawTrace.method, rawTrace.line, rawTrace.count));
                 }
             }
 
             // Add trace info to allocation record
-            for (var trace of allTraces) {
-                for (var alloc of this.allocationFileMap.get(trace.file)!) {
+            for (const trace of allTraces) {
+                for (const alloc of this.allocationFileMap.get(trace.file)!) {
                     if (alloc.kind === AllocationKind.LINE && alloc.line === trace.line - 1 && alloc.name === d.name && alloc.size === d.size) {
-                        alloc.dupeCount = d.duplicates;
+                        alloc.dupeCount += d.duplicates;
                         alloc.duplicates = allTraces;
                     }
                 }
@@ -265,7 +228,7 @@ export class ExtensionManager {
 
         // Fill allocationFileMap with aggregated method and class info
         this.classFileMap.forEach(c => {
-            let classRecord: AllocationRecord = new AllocationRecord(c.name, c.declared, AllocationKind.CLASS);
+            const classRecord: AllocationRecord = new AllocationRecord(c.name, c.declared, AllocationKind.CLASS);
             classRecord.size = c.allocated;
             if (this.allocationFileMap.has(c.file)) {
                 this.allocationFileMap.get(c.file)!.push(classRecord);
@@ -273,12 +236,12 @@ export class ExtensionManager {
                 this.allocationFileMap.set(c.file, [classRecord]);
             }
             c.methods.forEach(m => {
-                let methodRecord: AllocationRecord = new AllocationRecord(m.name, m.declared, AllocationKind.METHOD);
+                const methodRecord: AllocationRecord = new AllocationRecord(m.name, m.declared, AllocationKind.METHOD);
                 methodRecord.size = m.allocated;
                 this.allocationFileMap.get(c.file)!.push(methodRecord);
             });
             c.constructors.forEach(con => {
-                let methodRecord: AllocationRecord = new AllocationRecord(con.name, con.declared, AllocationKind.METHOD);
+                const methodRecord: AllocationRecord = new AllocationRecord(con.name, con.declared, AllocationKind.METHOD);
                 methodRecord.size = con.allocated;
                 this.allocationFileMap.get(c.file)!.push(methodRecord);
             });

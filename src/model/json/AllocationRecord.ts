@@ -6,7 +6,7 @@ export class AllocationRecord {
     public line: number;
     public size: number = 0;
     public count: number = 1;
-    public dupeCount: number = 1;
+    public dupeCount: number = 0;
     public kind: AllocationKind;
     public duplicates: DuplicateTrace[] = [];
 

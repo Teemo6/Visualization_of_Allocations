@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import path from 'path';
 
 import { ClassRecord } from '../model/lsp/ClassRecord';
 import { AllocationJSON, createAllocationJSON } from './AllocationJSON';
@@ -14,7 +13,7 @@ export class Loader {
 
         try {
             let jsonPath: vscode.Uri = vscode.Uri.file("");
-            let userDefined = Constants.JSON_CONFIG.get<string>("defaultPath");
+            const userDefined = Constants.JSON_CONFIG.get<string>("defaultPath");
             if (userDefined) {
                 jsonPath = vscode.Uri.parse("file:/" + userDefined);
                 vscode.window.showInformationMessage("Memory Analyzer: Loading " + jsonPath.path);
@@ -29,8 +28,22 @@ export class Loader {
                         return false;
                     }
                 });
+                if (Constants.JSON_CONFIG.get<boolean>("askToSavePath")) {
+                    vscode.window.showInformationMessage(
+                        "Do you want to set " + jsonPath.path + " as default JSON path for this workspace?",
+                        "Yes",
+                        "No",
+                        "Don't ask again"
+                    ).then(answer => {
+                        if (answer === "Yes") {
+                            Constants.JSON_CONFIG.update("defaultPath", jsonPath.fsPath, vscode.ConfigurationTarget.Workspace);
+                        } else if (answer === "Don't ask again") {
+                            Constants.JSON_CONFIG.update("askToSavePath", false, vscode.ConfigurationTarget.Workspace);
+                        }
+                    });
+                }
             }
-            var rawData = await vscode.workspace.fs.readFile(jsonPath);
+            const rawData = await vscode.workspace.fs.readFile(jsonPath);
             this.loadedJSON = await JSON.parse(rawData.toString());
         } catch (error) {
             vscode.window.showErrorMessage("Memory Analyzer: Could not read JSON data");
@@ -60,27 +73,29 @@ export class Loader {
         }
 
         // No files found
-        let files: vscode.Uri[] = await vscode.workspace.findFiles("**/*.java");
+        const files: vscode.Uri[] = await vscode.workspace.findFiles("**/*.java");
         if (files.length === 0) {
             vscode.window.showErrorMessage("No Java files found in workspace");
             return false;
         }
 
-        // Check if LSP is active
-        var LSP = vscode.extensions.getExtension(Constants.LSP_EXTENSION);
+        // Check if LSP is present and active
+        const LSP = vscode.extensions.getExtension(Constants.LSP_EXTENSION);
         if (!LSP) {
             vscode.window.showErrorMessage("Language support for Java is not present");
             return false;
         }
+        await LSP.activate();
         if (!LSP.isActive) {
             vscode.window.showErrorMessage("Language support for Java is not ready yet, try again later");
             return false;
         }
 
         // Find every declaration of class and method
-        for (let file of files) {
-            let document = await vscode.workspace.openTextDocument(file);
-            let symbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', file);
+        for (const file of files) {
+            console.log(file.path);
+            const document = await vscode.workspace.openTextDocument(file);
+            const symbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', file);
 
             // File has no symbols, ignore
             if (!symbols) {
@@ -91,29 +106,29 @@ export class Loader {
             let filePackage: string = "";
 
             // Can be multiple classes
-            let fileClasses: { name: string, range: vscode.Range, declared: number, methods: { name: string, range: vscode.Range, declared: number }[], constructors: { name: string, range: vscode.Range, declared: number }[] }[] = [];
+            const fileClasses: { name: string, range: vscode.Range, declared: number, methods: { name: string, range: vscode.Range, declared: number }[], constructors: { name: string, range: vscode.Range, declared: number }[] }[] = [];
 
-            for (let symbol of symbols) {
+            for (const symbol of symbols) {
                 // Symbol is a class
                 if (symbol.kind === vscode.SymbolKind.Class) {
-                    var className = symbol.name;
-                    var classRange = symbol.range;
-                    var classDeclared = this.findDeclarationLine(symbol, document, "class\\s+" + symbol.name);
+                    const className = symbol.name;
+                    const classRange = symbol.range;
+                    const classDeclared = this.findDeclarationLine(symbol, document, "class\\s+" + symbol.name);
 
                     // Find every method of the class
-                    let classConstructors: { name: string, range: vscode.Range, declared: number }[] = [];
-                    let classMethods: { name: string, range: vscode.Range, declared: number }[] = [];
-                    for (let child of symbol.children) {
+                    const classConstructors: { name: string, range: vscode.Range, declared: number }[] = [];
+                    const classMethods: { name: string, range: vscode.Range, declared: number }[] = [];
+                    for (const child of symbol.children) {
                         // Found constructor
                         if (child.kind === vscode.SymbolKind.Constructor) {
-                            var childDeclared = this.findDeclarationLine(child, document, symbol.name + "\\s*\\(");
+                            const childDeclared = this.findDeclarationLine(child, document, symbol.name + "\\s*\\(");
                             classConstructors.push({ name: child.name, range: child.range, declared: childDeclared });
                         }
 
                         // Found method
                         if (child.kind === vscode.SymbolKind.Method) {
-                            var rawName = child.name.substring(0, child.name.indexOf("("));
-                            var childDeclared = this.findDeclarationLine(child, document, rawName + "\\s*\\(");
+                            const rawName = child.name.substring(0, child.name.indexOf("("));
+                            const childDeclared = this.findDeclarationLine(child, document, rawName + "\\s*\\(");
                             classMethods.push({ name: child.name, range: child.range, declared: childDeclared });
                         }
                     }
@@ -150,7 +165,7 @@ export class Loader {
     }
 
     private findDeclarationLine(symbol: vscode.DocumentSymbol, document: vscode.TextDocument, expression: string): number {
-        let regex = new RegExp(expression);
+        const regex = new RegExp(expression);
         for (let line = symbol.range.start.line; line <= symbol.range.end.line; line++) {
             if (regex.test(document.lineAt(line).text)) {
                 return line;

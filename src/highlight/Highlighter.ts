@@ -13,7 +13,7 @@ export class Highlighter {
     private showingData: boolean = false;
 
     private createAllocationText(size: number, count: number, duplicates: number, kind: AllocationKind): vscode.TextEditorDecorationType {
-        var bgColor, gutterPath, textColor;
+        let bgColor, gutterPath, textColor;
         if (size === 0) {
             bgColor = Constants.COLOR_CONFIG.get<string>("emptyBackground");
             textColor = Constants.COLOR_CONFIG.get<string>("emptyText");
@@ -32,7 +32,7 @@ export class Highlighter {
             gutterPath = Constants.CLASS_ALLOCATION_GUTTER;
         }
 
-        var text = " Allocated " + Intl.NumberFormat(Constants.NUMBER_LOCALE).format(size) + " Bytes";
+        let text = " Allocated total of " + Intl.NumberFormat(Constants.NUMBER_LOCALE).format(size) + " Bytes";
         if (count !== 1) {
             text += " in " + count + " instances";
         }
@@ -60,14 +60,14 @@ export class Highlighter {
         }
 
         // Get all visible editors
-        var editors = vscode.window.visibleTextEditors;
+        const editors = vscode.window.visibleTextEditors;
         if (!editors) {
             return;
         }
 
         // Add highlights according to the file map
-        for (var editor of editors) {
-            var path = editor.document.uri.path;
+        for (const editor of editors) {
+            const path = editor.document.uri.path;
             if (this.highlightMap.has(path)) {
                 this.highlightMap.get(path)!.forEach(e => {
                     editor.setDecorations(e.decorator, e.line);
@@ -93,14 +93,14 @@ export class Highlighter {
         }
 
         // Get all visible editors
-        var editors = vscode.window.visibleTextEditors;
+        const editors = vscode.window.visibleTextEditors;
         if (!editors) {
             return;
         }
 
         // Add highlights according to the file map
-        for (var editor of editors) {
-            var path = editor.document.uri.path;
+        for (const editor of editors) {
+            const path = editor.document.uri.path;
             if (this.highlightMap.has(path)) {
                 this.highlightMap.get(path)!.forEach(e => {
                     editor.setDecorations(e.decorator, []);
@@ -115,9 +115,9 @@ export class Highlighter {
 
         fileAllocationMap.forEach((data, file) => {
             // Group data by line
-            let lineMap: Map<number, {size: number, count: number, dupes: number, kind: AllocationKind}[]> = new Map();
+            const lineMap: Map<number, { size: number, count: number, dupes: number, kind: AllocationKind }[]> = new Map();
             data.forEach(r => {
-                var val = {size: r.size, count: r.count, dupes: r.dupeCount, kind: r.kind};
+                const val = { size: r.size, count: r.count, dupes: r.dupeCount, kind: r.kind };
                 if (lineMap.has(r.line)) {
                     lineMap.get(r.line)!.push(val);
                 } else {
@@ -126,22 +126,22 @@ export class Highlighter {
             });
 
             // Aggregate all data on line
-            let highlights: HighlightData[] = [];
-            for (var [line, arr] of lineMap){
+            const highlights: HighlightData[] = [];
+            for (const [line, arr] of lineMap) {
                 let allocSize: number = 0;
                 let allocCount: number = 0;
                 let dupeCount: number = 0;
                 let recordKind: AllocationKind = AllocationKind.LINE;
 
-                for (var val of arr){
+                for (const val of arr) {
                     allocSize += val.size * val.count;
                     allocCount += val.count;
                     dupeCount += val.dupes;
                     recordKind = val.kind;
                 }
 
-                var decorator = this.createAllocationText(allocSize, allocCount, dupeCount, recordKind);
-                var range = [new vscode.Range(new vscode.Position(line, 0), new vscode.Position(line, 0))];
+                const decorator = this.createAllocationText(allocSize, allocCount, dupeCount, recordKind);
+                const range = [new vscode.Range(new vscode.Position(line, 0), new vscode.Position(line, 0))];
                 highlights.push(new HighlightData(decorator, range, recordKind));
             }
 

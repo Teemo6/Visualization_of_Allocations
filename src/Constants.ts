@@ -20,7 +20,7 @@ export class Constants {
     public static CLASS_ALLOCATION_GUTTER: vscode.Uri = vscode.Uri.file(path.join(__dirname, 'icons', 'class_allocation.svg'));
     public static NO_ALLOCATION_GUTTER: vscode.Uri = vscode.Uri.file(path.join(__dirname, "icons", "no_allocation.svg"));
 
-    public static updateConfiguration(){
+    public static updateConfiguration() {
         Constants.COLOR_CONFIG = vscode.workspace.getConfiguration("java-memory-analyzer.color");
         Constants.JSON_CONFIG = vscode.workspace.getConfiguration("java-memory-analyzer.json");
     }

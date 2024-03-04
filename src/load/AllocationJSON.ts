@@ -31,12 +31,21 @@ export interface DuplicateTraceJSON {
     count: number;
 }
 
-export function createAllocationJSON(obj: any): AllocationJSON | undefined {
+export function createAllocationJSON(input: unknown): AllocationJSON | undefined {
+    if (!isSomeObject(input)) {
+        return undefined;
+    }
+
+    const obj = input as object;
+    if (!Array.isArray(obj)) {
+        return undefined;
+    }
+
     if (!(obj.length === 2)) {
         return undefined;
     }
 
-    if (!(obj[0].LINE && obj[1].DUPLICATE)) {
+    if (!("LINE" in obj[0] && "DUPLICATE" in obj[1])) {
         return undefined;
     }
 
@@ -44,13 +53,17 @@ export function createAllocationJSON(obj: any): AllocationJSON | undefined {
         return undefined;
     }
 
-    for (var line of obj[0].LINE) {
+    if (obj[0].LINE.length === 0 && obj[1].DUPLICATE.length !== 0) {
+        return undefined;
+    }
+
+    for (const line of obj[0].LINE) {
         if (!isLineJSON(line)) {
             return undefined;
         }
     }
 
-    for (var duplicate of obj[1].DUPLICATE) {
+    for (const duplicate of obj[1].DUPLICATE) {
         if (!isDuplicateJSON(duplicate)) {
             return undefined;
         }
@@ -59,14 +72,19 @@ export function createAllocationJSON(obj: any): AllocationJSON | undefined {
     return new AllocationJSON(obj[0].LINE, obj[1].DUPLICATE);
 }
 
-export function isLineJSON(obj: any): obj is LineJSON {
+export function isLineJSON(input: unknown): input is LineJSON {
+    if (!isSomeObject(input)) {
+        return false;
+    }
+
+    const obj = input as LineJSON;
     if (!(
-        typeof obj.class === "string" &&
-        typeof obj.method === "string" &&
-        typeof obj.line === "number" &&
-        typeof obj.size === "number" &&
-        typeof obj.count === "number" &&
-        typeof obj.name === "string"
+        typeof obj?.class === "string" &&
+        typeof obj?.method === "string" &&
+        typeof obj?.line === "number" &&
+        typeof obj?.size === "number" &&
+        typeof obj?.count === "number" &&
+        typeof obj?.name === "string"
     )) {
         return false;
     }
@@ -77,11 +95,16 @@ export function isLineJSON(obj: any): obj is LineJSON {
     return true;
 }
 
-export function isDuplicateJSON(obj: any): obj is DuplicateJSON {
+export function isDuplicateJSON(input: unknown): input is DuplicateJSON {
+    if (!isSomeObject(input)) {
+        return false;
+    }
+
+    const obj = input as DuplicateJSON;
     if (!(
-        typeof obj.name === "string" &&
-        typeof obj.size === "number" &&
-        typeof obj.duplicates === "number"
+        typeof obj?.name === "string" &&
+        typeof obj?.size === "number" &&
+        typeof obj?.duplicates === "number"
     )) {
         return false;
     }
@@ -94,7 +117,7 @@ export function isDuplicateJSON(obj: any): obj is DuplicateJSON {
         return false;
     }
 
-    for (var trace of obj.traces) {
+    for (const trace of obj.traces) {
         if (!isDuplicateTraceJSON(trace)) {
             return false;
         }
@@ -102,17 +125,33 @@ export function isDuplicateJSON(obj: any): obj is DuplicateJSON {
     return true;
 }
 
-export function isDuplicateTraceJSON(obj: any): obj is DuplicateTraceJSON {
+export function isDuplicateTraceJSON(input: unknown): input is DuplicateTraceJSON {
+    if (!isSomeObject(input)) {
+        return false;
+    }
+
+    const obj = input as DuplicateTraceJSON;
     if (!(
-        typeof obj.class === "string" &&
-        typeof obj.method === "string" &&
-        typeof obj.line === "number" &&
-        typeof obj.count === "number"
+        typeof obj?.class === "string" &&
+        typeof obj?.method === "string" &&
+        typeof obj?.line === "number" &&
+        typeof obj?.count === "number"
     )) {
         return false;
     }
 
     if (!(obj.line > 0 && obj.count > 0)) {
+        return false;
+    }
+    return true;
+}
+
+export function isSomeObject(obj: unknown): boolean {
+    if (obj === null) {
+        return false;
+    }
+
+    if (typeof obj !== "object") {
         return false;
     }
     return true;

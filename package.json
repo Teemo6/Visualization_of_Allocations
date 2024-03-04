@@ -52,7 +52,12 @@
         "java-memory-analyzer.json.defaultPath": {
           "type": "string",
           "default": "",
-          "description": "Absolute path to JSON file, leave empty to always ask"
+          "description": "Absolute path to JSON file, leave empty to select manually"
+        },
+        "java-memory-analyzer.json.askToSavePath": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ask if you want to save file path for current workspace when loading JSON file without path set"
         },
         "java-memory-analyzer.color.lineBackground": {
           "type": "string",
@@ -103,6 +108,7 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
+    "lint-fix": "eslint . --ext .ts --fix",
     "test": "vscode-test"
   },
   "devDependencies": {

@@ -9,10 +9,10 @@ suite('Allocation JSON', () => {
     vscode.window.showInformationMessage('Running JSON file loading tests');
 
     test('Valid regular JSON', async () => {
-        var jsonData;
+        let jsonData;
         try {
-            var dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'valid_regular.json'));
-            var rawData = await vscode.workspace.fs.readFile(dataUri);
+            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'valid_regular.json'));
+            const rawData = await vscode.workspace.fs.readFile(dataUri);
             jsonData = JSON.parse(rawData.toString());
         } catch (error) {
             vscode.window.showErrorMessage("Invalid JSON file");
@@ -23,10 +23,10 @@ suite('Allocation JSON', () => {
     });
 
     test('Valid empty JSON', async () => {
-        var jsonData;
+        let jsonData;
         try {
-            var dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'valid_empty.json'));
-            var rawData = await vscode.workspace.fs.readFile(dataUri);
+            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'valid_empty.json'));
+            const rawData = await vscode.workspace.fs.readFile(dataUri);
             jsonData = JSON.parse(rawData.toString());
         } catch (error) {
             vscode.window.showErrorMessage("Invalid JSON file");
@@ -37,10 +37,10 @@ suite('Allocation JSON', () => {
     });
 
     test('Invalid key JSON', async () => {
-        var jsonData;
+        let jsonData;
         try {
-            var dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_key.json'));
-            var rawData = await vscode.workspace.fs.readFile(dataUri);
+            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_key.json'));
+            const rawData = await vscode.workspace.fs.readFile(dataUri);
             jsonData = JSON.parse(rawData.toString());
         } catch (error) {
             vscode.window.showErrorMessage("Invalid JSON file");
@@ -51,10 +51,10 @@ suite('Allocation JSON', () => {
     });
 
     test('Invalid value JSON', async () => {
-        var jsonData;
+        let jsonData;
         try {
-            var dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_value.json'));
-            var rawData = await vscode.workspace.fs.readFile(dataUri);
+            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_value.json'));
+            const rawData = await vscode.workspace.fs.readFile(dataUri);
             jsonData = JSON.parse(rawData.toString());
         } catch (error) {
             vscode.window.showErrorMessage("Invalid JSON file");
@@ -65,10 +65,10 @@ suite('Allocation JSON', () => {
     });
 
     test('Invalid missing line JSON', async () => {
-        var jsonData;
+        let jsonData;
         try {
-            var dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_missing_line.json'));
-            var rawData = await vscode.workspace.fs.readFile(dataUri);
+            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_missing_line.json'));
+            const rawData = await vscode.workspace.fs.readFile(dataUri);
             jsonData = JSON.parse(rawData.toString());
         } catch (error) {
             vscode.window.showErrorMessage("Invalid JSON file");
@@ -79,10 +79,10 @@ suite('Allocation JSON', () => {
     });
 
     test('Invalid missing method JSON', async () => {
-        var jsonData;
+        let jsonData;
         try {
-            var dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_missing_method.json'));
-            var rawData = await vscode.workspace.fs.readFile(dataUri);
+            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_missing_method.json'));
+            const rawData = await vscode.workspace.fs.readFile(dataUri);
             jsonData = JSON.parse(rawData.toString());
         } catch (error) {
             vscode.window.showErrorMessage("Invalid JSON file");
@@ -93,10 +93,10 @@ suite('Allocation JSON', () => {
     });
 
     test('Invalid missing class JSON', async () => {
-        var jsonData;
+        let jsonData;
         try {
-            var dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_missing_class.json'));
-            var rawData = await vscode.workspace.fs.readFile(dataUri);
+            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_missing_class.json'));
+            const rawData = await vscode.workspace.fs.readFile(dataUri);
             jsonData = JSON.parse(rawData.toString());
         } catch (error) {
             vscode.window.showErrorMessage("Invalid JSON file");
@@ -107,10 +107,10 @@ suite('Allocation JSON', () => {
     });
 
     test('Invalid missing duplicate JSON', async () => {
-        var jsonData;
+        let jsonData;
         try {
-            var dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_missing_duplicate.json'));
-            var rawData = await vscode.workspace.fs.readFile(dataUri);
+            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_missing_duplicate.json'));
+            const rawData = await vscode.workspace.fs.readFile(dataUri);
             jsonData = JSON.parse(rawData.toString());
         } catch (error) {
             vscode.window.showErrorMessage("Invalid JSON file");
@@ -121,10 +121,10 @@ suite('Allocation JSON', () => {
     });
 
     test('Invalid JSON', async () => {
-        var jsonData;
+        let jsonData;
         try {
-            var dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_json.json'));
-            var rawData = await vscode.workspace.fs.readFile(dataUri);
+            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_json.json'));
+            const rawData = await vscode.workspace.fs.readFile(dataUri);
             jsonData = JSON.parse(rawData.toString());
         } catch (error) {
             vscode.window.showErrorMessage("Invalid JSON file");
