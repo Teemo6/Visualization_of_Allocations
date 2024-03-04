@@ -1,14 +1,16 @@
 import * as vscode from 'vscode';
+import { ExtensionManager } from '../ExtensionManager';
 
 export class WebviewTable {
-    public panel: vscode.WebviewPanel | undefined;
-    public extensionUri: vscode.Uri | undefined;
+    private panel: vscode.WebviewPanel | undefined;
+    private extensionUri: vscode.Uri | undefined;
 
-    public createNewPanel(context: vscode.ExtensionContext): void {
-        this.extensionUri = context.extensionUri;
+    public createNewPanel(manager: ExtensionManager): void {
+        this.extensionUri = manager.context.extensionUri;
         this.panel = vscode.window.createWebviewPanel("analyzerView", "Memory Analyzer", vscode.ViewColumn.Two, {
             enableScripts: true,
-            localResourceRoots: [context.extensionUri]
+            retainContextWhenHidden: true,
+            localResourceRoots: [manager.context.extensionUri]
         });
         this.panel.onDidDispose(() => this.panel = undefined);
         this.panel.webview.html = this.getHTML();
@@ -16,12 +18,12 @@ export class WebviewTable {
         this.panel.webview.onDidReceiveMessage(
             message => {
                 if (message.command === "goto") {
-                    vscode.window.showInformationMessage(message.text);
+                    manager.gotoLine(message.text);
                     return;
                 }
             },
             undefined,
-            context.subscriptions
+            manager.context.subscriptions
         );
     }
 

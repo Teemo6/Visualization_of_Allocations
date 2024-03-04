@@ -4,11 +4,14 @@
 
     window.addEventListener("message", e => {
         const message = e.data;
+
+        // No allocation data 
         if (message.type === "noData") {
             document.getElementById("alloc").innerHTML = "<h3>No allocation data for line " + message.line + "</h3>";
             document.getElementById("dupe").innerHTML = "";
         }
 
+        // Got message with data
         if (message.type === "data") {
             // Fill allocation table
             let allocTable = `
@@ -29,7 +32,6 @@
                         </tr>`;
             });
             allocTable += "</table>";
-            // eslint-disable-next-line no-undef
             document.getElementById("alloc").innerHTML = allocTable;
 
             // Fill duplicate table

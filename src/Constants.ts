@@ -14,6 +14,8 @@ export class Constants {
 
     public static NUMBER_LOCALE: string = "cs-CZ";
 
+    public static DUPLICATE_DETAIL_DELI: string = ":";
+
     // Default gutter path
     public static LINE_ALLOCATION_GUTTER: vscode.Uri = vscode.Uri.file(path.join(__dirname, "icons", "line_allocation.svg"));
     public static METHOD_ALLOCATION_GUTTER: vscode.Uri = vscode.Uri.file(path.join(__dirname, "icons", "method_allocation.svg"));

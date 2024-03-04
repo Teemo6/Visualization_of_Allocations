@@ -11,7 +11,7 @@ import { DuplicateTrace } from './model/json/DuplicateTrace';
 import { WebviewTable } from './webview/WebviewTable';
 
 export class ExtensionManager {
-    private readonly context: vscode.ExtensionContext;
+    public readonly context: vscode.ExtensionContext;
 
     private readonly loader: Loader = new Loader;
     private readonly highlighter: Highlighter = new Highlighter;
@@ -95,7 +95,7 @@ export class ExtensionManager {
 
         // Webview
         if (!this.webviewTable.hasActivePanel()) {
-            this.webviewTable.createNewPanel(this.context);
+            this.webviewTable.createNewPanel(this);
         }
 
         // Send data to webview
@@ -134,6 +134,30 @@ export class ExtensionManager {
 
     public updateConfig(): void {
         Constants.updateConfiguration();
+    }
+
+    public async gotoLine(exp: string): Promise<void> {
+        const parts = exp.split(Constants.DUPLICATE_DETAIL_DELI);
+        if (this.classFileMap.has(parts[0])) {
+            try {
+                const document = await vscode.workspace.openTextDocument(this.classFileMap.get(parts[0])!.file);
+                const editor = await vscode.window.showTextDocument(document, {
+                    viewColumn: vscode.ViewColumn.One,
+                    preserveFocus: true,
+                    preview: false
+                });
+                const intLine = parseInt(parts[2]) - 1;
+                if (document.lineCount < parseInt(parts[2]) - 1) {
+                    vscode.window.showErrorMessage("Allocation line " + intLine + " out of bound");
+                    return;
+                }
+                const cursorPos = new vscode.Selection(new vscode.Position(intLine, 0), new vscode.Position(intLine, 0));
+                editor.selection = cursorPos;
+                editor.revealRange(cursorPos);
+            } catch (error) {
+                console.error("Cannot find file " + parts[0]);
+            }
+        }
     }
 
     private async mapSymbolsAndJSON(): Promise<boolean> {

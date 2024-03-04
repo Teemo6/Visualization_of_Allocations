@@ -1,3 +1,5 @@
+import { Constants } from "../../Constants";
+
 export class DuplicateTrace {
     public file: string;
     public class: string;
@@ -14,7 +16,6 @@ export class DuplicateTrace {
     }
 
     public getJavaSource(): string {
-        return this.class + ":" + this.method + ":" + this.line;
+        return this.class + Constants.DUPLICATE_DETAIL_DELI + this.method + Constants.DUPLICATE_DETAIL_DELI + this.line;
     }
-
 }
