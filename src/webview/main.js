@@ -1,4 +1,7 @@
 /* eslint-disable no-undef */
+/**
+ * Add event listener to receieve message and listener for duplicate source click
+ */
 (function () {
     const vscode = acquireVsCodeApi();
 

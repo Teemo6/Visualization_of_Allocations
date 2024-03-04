@@ -19,10 +19,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "java-memory-analyzer.runAnalyzer",
-        "title": "Memory Analyzer: Analyze JAR file"
-      },
-      {
         "command": "java-memory-analyzer.loadFile",
         "title": "Memory Analyzer: Load JSON file"
       },

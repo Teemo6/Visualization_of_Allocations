@@ -4,14 +4,29 @@ import { ClassRecord } from '../model/lsp/ClassRecord';
 import { AllocationJSON, createAllocationJSON } from './AllocationJSON';
 import { Constants } from '../Constants';
 
+/**
+ * Handle JSON file loading and Java symbols loading
+ */
 export class Loader {
+    /**
+     * Loaded file data
+     */
     private loadedJSON: AllocationJSON | undefined = undefined;
-    private classFileMap: Map<string, ClassRecord> = new Map();     // Map <"package.class", symbols in class>
+    /**
+     *  Map<"package.class", Java symbols in class>
+     */
+    private classFileMap: Map<string, ClassRecord> = new Map();
 
+    /**
+     * Load specified JSON data from file accorting to user settings, if no path is provided, open file dialog
+     * @returns JSON file was successfully/unsucessfully parsed
+     */
     public async loadJSONFile(): Promise<boolean> {
+        // Reset local data
         this.loadedJSON = undefined;
 
         try {
+            // Load file according to settings or open file dialog 
             let jsonPath: vscode.Uri = vscode.Uri.file("");
             const userDefined = Constants.JSON_CONFIG.get<string>("defaultPath");
             if (userDefined) {
@@ -28,6 +43,7 @@ export class Loader {
                         return false;
                     }
                 });
+                // Ask to save JSON path in workspace settings
                 if (Constants.JSON_CONFIG.get<boolean>("askToSavePath")) {
                     vscode.window.showInformationMessage(
                         "Do you want to set " + jsonPath.path + " as default JSON path for this workspace?",
@@ -50,6 +66,7 @@ export class Loader {
             return false;
         }
 
+        // Check if loaded data have specified format
         this.loadedJSON = createAllocationJSON(this.loadedJSON);
         if (!this.loadedJSON) {
             vscode.window.showErrorMessage("JSON file has unexpected format");
@@ -58,10 +75,17 @@ export class Loader {
         return true;
     }
 
+    /**
+     * @returns loaded JSON data from file, undefined if no data are present
+     */
     public getAllocationJSON(): AllocationJSON | undefined {
         return this.loadedJSON;
     }
 
+    /**
+     * Load Java symbols from LSP (Language Service Provider) extension in current workspace
+     * @returns Java symols have been successfully/unsucessfully loaded
+     */
     public async loadProject(): Promise<boolean> {
         // Clear previous data
         this.classFileMap.clear();
@@ -150,20 +174,29 @@ export class Loader {
             });
         }
 
+        // No symbols found
         if (this.classFileMap.size === 0) {
             vscode.window.showErrorMessage("Could not find any Java symbols");
             return false;
         }
-
         return true;
     }
 
-    // Key = package.class
-    // Value = class data
+    /**
+     * @returns Map<"package.class", Java symbols in class>
+     */
     public getFileMap(): Map<string, ClassRecord> {
         return this.classFileMap;
     }
 
+    /**
+     * Find at which line inside Java symbol is expression 
+     * (used for class/method declaration line symbol.range.start.line does not always show correct declaration line)
+     * @param symbol Java symbol
+     * @param document Document which contains symbol
+     * @param expression Expression to find
+     * @returns Declaration line indexed from 0, symbol.range.start.line if expression is not found
+     */
     private findDeclarationLine(symbol: vscode.DocumentSymbol, document: vscode.TextDocument, expression: string): number {
         const regex = new RegExp(expression);
         for (let line = symbol.range.start.line; line <= symbol.range.end.line; line++) {

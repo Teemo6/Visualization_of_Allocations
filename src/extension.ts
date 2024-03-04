@@ -2,14 +2,15 @@ import * as vscode from 'vscode';
 
 import { ExtensionManager } from './ExtensionManager';
 
+/**
+ * Function that activates Memory Analyzer extension, called when first user request is made
+ * @param context context passed from VSCode
+ */
 export function activate(context: vscode.ExtensionContext): void {
     // Persistent object
     const manager: ExtensionManager = new ExtensionManager(context);
 
     // Command actions
-    // Run Memory Analyzer and load JSON file
-    const runAnalyzer = vscode.commands.registerCommand('java-memory-analyzer.runAnalyzer', manager.runAnalyzer.bind(manager));
-
     // Only load JSON file
     const loadFile = vscode.commands.registerCommand('java-memory-analyzer.loadFile', manager.loadFile.bind(manager));
 
@@ -26,11 +27,7 @@ export function activate(context: vscode.ExtensionContext): void {
     // Load highlight on editor activation
     const highlightLines = vscode.window.onDidChangeVisibleTextEditors(manager.highlightEditors.bind(manager));
 
-    // Update highlight colors upon editing configuration
-    const updateConfig = vscode.workspace.onDidChangeConfiguration(manager.updateConfig.bind(manager));
-
     // Command actions
-    context.subscriptions.push(runAnalyzer);
     context.subscriptions.push(loadFile);
     context.subscriptions.push(showDetail);
     context.subscriptions.push(stopShowing);
@@ -38,5 +35,4 @@ export function activate(context: vscode.ExtensionContext): void {
 
     // Event actions
     context.subscriptions.push(highlightLines);
-    context.subscriptions.push(updateConfig);
 }

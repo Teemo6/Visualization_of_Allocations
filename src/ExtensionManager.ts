@@ -10,27 +10,43 @@ import { AllocationJSON } from './load/AllocationJSON';
 import { DuplicateTrace } from './model/json/DuplicateTrace';
 import { WebviewTable } from './webview/WebviewTable';
 
+/**
+ * Persistent extension object, keeps all loaded data and manages other modules
+ */
 export class ExtensionManager {
+    /**
+     * Extension context
+     */
     public readonly context: vscode.ExtensionContext;
 
     private readonly loader: Loader = new Loader;
     private readonly highlighter: Highlighter = new Highlighter;
-    public readonly webviewTable: WebviewTable = new WebviewTable;
+    private readonly webviewTable: WebviewTable = new WebviewTable;
 
-    private loadedJSON: AllocationJSON | undefined = undefined;                     // JSON data => got from Loader JSON file
-    private classFileMap: Map<string, ClassRecord> = new Map();                     // Map <"package.class", symbols in class> => got from Loader Java symbols
-    private allocationFileMap: Map<string, AllocationRecord[]> = new Map();         // Map <file path, all line data> => created mapping between JSON an Java symbols
-
+    /**
+     * Loadded JSON data from JSON file provided by Loader
+     */
+    private loadedJSON: AllocationJSON | undefined = undefined;
+    /**
+     * Map<"package.class", symbols in file> provided by Loader
+     */
+    private classFileMap: Map<string, ClassRecord> = new Map();
+    /**
+     * Map<"file path", all line data> => created mapping between JSON file an Java symbols
+     */
+    private allocationFileMap: Map<string, AllocationRecord[]> = new Map();
+    
+    /**
+     * Pass extension context to persistent manager
+     * @param context extension context
+     */
     constructor(context: vscode.ExtensionContext) {
         this.context = context;
     }
 
-    public async runAnalyzer(): Promise<void> {
-        vscode.window.setStatusBarMessage("Running analyzer");
-
-        vscode.window.setStatusBarMessage("Done running analyzer");
-    }
-
+    /**
+     * Load JSON file, map Java symbols and highlight data
+     */
     public async loadFile(): Promise<void> {
         vscode.window.setStatusBarMessage("Loading JSON file");
 
@@ -70,6 +86,9 @@ export class ExtensionManager {
         vscode.window.setStatusBarMessage("Done loading JSON file");
     }
 
+    /**
+     * Show webview panel with line allocation / duplicate details
+     */
     public async showDetail(): Promise<void> {
         vscode.window.setStatusBarMessage("Showing line details");
 
@@ -86,6 +105,7 @@ export class ExtensionManager {
             return;
         }
 
+        // Gather all active line data
         const lineRecords: AllocationRecord[] = [];
         for (const r of records!) {
             if (r.kind === AllocationKind.LINE && r.line === activeLine) {
@@ -93,7 +113,7 @@ export class ExtensionManager {
             }
         }
 
-        // Webview
+        // Init webview
         if (!this.webviewTable.hasActivePanel()) {
             this.webviewTable.createNewPanel(this);
         }
@@ -102,7 +122,6 @@ export class ExtensionManager {
         if (lineRecords.length === 0 || lineRecords[0].kind !== AllocationKind.LINE) {
             this.webviewTable.sendNothingToTable(activeLine + 1);
         } else {
-            console.log(lineRecords);
             const allocData: { name: string, size: number, count: number }[] = [];
             const dupeData: { name: string, size: number, count: number, source: string }[] = [];
 
@@ -118,24 +137,33 @@ export class ExtensionManager {
         vscode.window.setStatusBarMessage("Done showing line details");
     }
 
+    /**
+     * Hide highlight data
+     */
     public stopShowingData(): void {
         this.highlighter.stopShowingData();
     }
 
+    /**
+     * Show highlight data (if any)
+     */
     public startShowingData(): void {
         if (!this.highlighter.startShowingData()) {
             vscode.window.showErrorMessage("No data to show");
         }
     }
 
+    /**
+     * Highlight all visible editors
+     */
     public highlightEditors(): void {
         this.highlighter.highlightEditors();
     }
 
-    public updateConfig(): void {
-        Constants.updateConfiguration();
-    }
-
+    /**
+     * Open text editor and go to specified line, separates data with "deli" specified in Constants
+     * @param exp format as following: \<package with class\>"deli"\<method\>"deli"\<line\> 
+     */
     public async gotoLine(exp: string): Promise<void> {
         const parts = exp.split(Constants.DUPLICATE_DETAIL_DELI);
         if (this.classFileMap.has(parts[0])) {
@@ -160,6 +188,10 @@ export class ExtensionManager {
         }
     }
 
+    /**
+     * Map JSON data to Java symbols, prepare allocation records for every symbol
+     * @returns bool operation successful/unsucessful
+     */
     private async mapSymbolsAndJSON(): Promise<boolean> {
         if (!this.loadedJSON) {
             return false;
