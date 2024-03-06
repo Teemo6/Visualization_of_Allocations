@@ -35,7 +35,7 @@ export class ExtensionManager {
      * Map<"file path", all line data> => created mapping between JSON file an Java symbols
      */
     private allocationFileMap: Map<string, AllocationRecord[]> = new Map();
-    
+
     /**
      * Pass extension context to persistent manager
      * @param context extension context
@@ -76,6 +76,7 @@ export class ExtensionManager {
             this.loadedJSON = undefined;
             this.classFileMap = new Map();
             this.allocationFileMap = new Map();
+            vscode.window.setStatusBarMessage("Could not map JSON data to Java symbols");
             return;
         }
 
@@ -94,14 +95,15 @@ export class ExtensionManager {
 
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
-            vscode.window.showErrorMessage('No active editor');
+            vscode.window.showErrorMessage("No active editor");
+            return;
         }
 
         // Select active line
         const activeLine = editor!.selection.active.line;
         const records = this.allocationFileMap.get(editor!.document.uri.path);
         if (!records) {
-            vscode.window.showErrorMessage('Nothing to show');
+            vscode.window.showErrorMessage("No data to show");
             return;
         }
 
@@ -167,24 +169,23 @@ export class ExtensionManager {
     public async gotoLine(exp: string): Promise<void> {
         const parts = exp.split(Constants.DUPLICATE_DETAIL_DELI);
         if (this.classFileMap.has(parts[0])) {
-            try {
-                const document = await vscode.workspace.openTextDocument(this.classFileMap.get(parts[0])!.file);
-                const editor = await vscode.window.showTextDocument(document, {
-                    viewColumn: vscode.ViewColumn.One,
-                    preserveFocus: true,
-                    preview: false
-                });
-                const intLine = parseInt(parts[2]) - 1;
-                if (document.lineCount < parseInt(parts[2]) - 1) {
-                    vscode.window.showErrorMessage("Allocation line " + intLine + " out of bound");
-                    return;
-                }
-                const cursorPos = new vscode.Selection(new vscode.Position(intLine, 0), new vscode.Position(intLine, 0));
-                editor.selection = cursorPos;
-                editor.revealRange(cursorPos);
-            } catch (error) {
-                console.error("Cannot find file " + parts[0]);
+            const document = await vscode.workspace.openTextDocument(this.classFileMap.get(parts[0])!.file);
+            const editor = await vscode.window.showTextDocument(document, {
+                viewColumn: vscode.ViewColumn.One,
+                preserveFocus: true,
+                preview: false
+            });
+            const intLine = parseInt(parts[2]) - 1;
+            if (document.lineCount < parseInt(parts[2]) - 1) {
+                vscode.window.showErrorMessage("Allocation line " + intLine + " out of bound");
+                return;
             }
+            const cursorPos = new vscode.Selection(new vscode.Position(intLine, 0), new vscode.Position(intLine, 0));
+            editor.selection = cursorPos;
+            editor.revealRange(cursorPos);
+        } else {
+            console.error("Cannot find file " + parts[0]);
+            vscode.window.showErrorMessage("Cannot find file " + parts[0]);
         }
     }
 
@@ -202,9 +203,11 @@ export class ExtensionManager {
             // Editor is indexing from 0
             const editorLine = l.line - 1;
 
-            // Anonymous call, trim it
-            if (l.class.endsWith("$1")) {
-                l.class = l.class.substring(0, l.class.indexOf("$1"));
+            // Nested call, trim it
+            if (l.class.indexOf("$") !== -1) {
+                const trim = l.class.substring(0, l.class.indexOf("$"));
+                console.warn("Found nested symbol " + l.class + ":" + l.line + ", trimming to " + trim);
+                l.class = trim;
             }
 
             // Find JSON class in workspace symbols
@@ -213,8 +216,8 @@ export class ExtensionManager {
                 const classRecord = this.classFileMap.get(l.class);
                 const document = await vscode.workspace.openTextDocument(classRecord!.file);
                 if (document.lineCount < l.line) {
-                    vscode.window.showErrorMessage("Allocation line " + l.class + ":" + l.line + " out of bound");
-                    return false;
+                    console.error("Allocation line " + l.class + ":" + l.line + " out of bound for file " + classRecord!.file);
+                    continue;
                 }
 
                 // Reduce line by offset
@@ -248,9 +251,12 @@ export class ExtensionManager {
                     } else {
                         this.allocationFileMap.set(classRecord!.file, [lineRecord]);
                     }
+                } else {
+                    console.error("Allocation line " + l.class + ":" + l.line + " out of symbol range");
+                    continue;
                 }
             } else {
-                console.log("Could not resolve class " + l.class);
+                console.error("Could not resolve class " + l.class + " of allocation " + l.class + ":" + l.method + ":" + l.line);
             }
         }
 
@@ -259,15 +265,21 @@ export class ExtensionManager {
             // Load every trace of duplicate
             const allTraces: DuplicateTrace[] = [];
             for (const rawTrace of d.traces) {
-                // Anonymous call, rename it
-                if (rawTrace.class.endsWith("$1")) {
-                    rawTrace.class = rawTrace.class.substring(0, rawTrace.class.indexOf("$1"));
+
+                // Nested call, trim it
+                if (rawTrace.class.indexOf("$") !== -1) {
+                    const trim = rawTrace.class.substring(0, rawTrace.class.indexOf("$"));
+                    console.warn("Found nested symbol " + rawTrace.class + ":" + rawTrace.line + ", trimming to " + trim);
+                    rawTrace.class = trim;
                 }
 
                 // Map trace to Java file
                 if (this.classFileMap.has(rawTrace.class)) {
                     const tracePath = this.classFileMap.get(rawTrace.class)!.file;
                     allTraces.push(new DuplicateTrace(tracePath, rawTrace.class, rawTrace.method, rawTrace.line, rawTrace.count));
+                } else {
+                    console.error("Could not resolve class " + rawTrace.class + " of duplicate trace " + rawTrace.class + ":" + rawTrace.method + ":" + rawTrace.line);
+                    continue;
                 }
             }
 
@@ -276,7 +288,7 @@ export class ExtensionManager {
                 for (const alloc of this.allocationFileMap.get(trace.file)!) {
                     if (alloc.kind === AllocationKind.LINE && alloc.line === trace.line - 1 && alloc.name === d.name && alloc.size === d.size) {
                         alloc.dupeCount += d.duplicates;
-                        alloc.duplicates = allTraces;
+                        alloc.duplicates.push(...allTraces);
                     }
                 }
             }

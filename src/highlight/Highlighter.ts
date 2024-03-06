@@ -152,7 +152,7 @@ export class Highlighter {
             gutterPath = Constants.CLASS_ALLOCATION_GUTTER;
         }
 
-        let text = " Allocated total of " + Intl.NumberFormat(Constants.NUMBER_LOCALE).format(size) + " Bytes";
+        let text = " Total of " + Intl.NumberFormat(Constants.NUMBER_LOCALE).format(size) + " Bytes";
         if (count !== 1) {
             text += " in " + count + " instances";
         }

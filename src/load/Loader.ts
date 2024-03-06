@@ -109,7 +109,6 @@ export class Loader {
             vscode.window.showErrorMessage("Language support for Java is not present");
             return false;
         }
-        await LSP.activate();
         if (!LSP.isActive) {
             vscode.window.showErrorMessage("Language support for Java is not ready yet, try again later");
             return false;
@@ -117,7 +116,6 @@ export class Loader {
 
         // Find every declaration of class and method
         for (const file of files) {
-            console.log(file.path);
             const document = await vscode.workspace.openTextDocument(file);
             const symbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', file);
 
@@ -179,6 +177,21 @@ export class Loader {
             vscode.window.showErrorMessage("Could not find any Java symbols");
             return false;
         }
+
+        // Check if files contain some symbols
+        files.forEach(f => {
+            let found = false;
+            for (const val of this.classFileMap.values()) {
+                if (f.path === val.file) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found){
+                console.warn("Found no symbols in file " + f.path);
+            }
+        });
+
         return true;
     }
 
