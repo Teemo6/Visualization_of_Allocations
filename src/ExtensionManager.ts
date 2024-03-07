@@ -48,8 +48,6 @@ export class ExtensionManager {
      * Load JSON file, map Java symbols and highlight data
      */
     public async loadFile(): Promise<void> {
-        vscode.window.setStatusBarMessage("Loading JSON file");
-
         // Load JSON file
         if (!await this.loader.loadJSONFile()) {
             return;
@@ -76,23 +74,20 @@ export class ExtensionManager {
             this.loadedJSON = undefined;
             this.classFileMap = new Map();
             this.allocationFileMap = new Map();
-            vscode.window.setStatusBarMessage("Could not map JSON data to Java symbols");
+            vscode.window.showErrorMessage("Could not map JSON data to Java symbols");
             return;
         }
 
         // Give data to Highlighter
+        this.stopShowingData();
         this.highlighter.loadAllFileData(this.allocationFileMap);
-        this.highlighter.startShowingData();
-
-        vscode.window.setStatusBarMessage("Done loading JSON file");
+        this.startShowingData();
     }
 
     /**
      * Show webview panel with line allocation / duplicate details
      */
     public async showDetail(): Promise<void> {
-        vscode.window.setStatusBarMessage("Showing line details");
-
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
             vscode.window.showErrorMessage("No active editor");
@@ -103,7 +98,13 @@ export class ExtensionManager {
         const activeLine = editor!.selection.active.line;
         const records = this.allocationFileMap.get(editor!.document.uri.path);
         if (!records) {
-            vscode.window.showErrorMessage("No data to show");
+            vscode.window.showErrorMessage("Load JSON first");
+            return;
+        }
+
+        // Check activated highlighter
+        if (!this.highlighter.isShowingData()){
+            vscode.window.showErrorMessage("Call 'Show data' first");
             return;
         }
 
@@ -133,10 +134,10 @@ export class ExtensionManager {
                     dupeData.push({ name: l.name, size: l.size, count: t.count, source: t.getJavaSource() });
                 });
             });
+            dupeData.sort((a, b) => a.source.localeCompare(b.source));
+
             this.webviewTable.sendDataToTable(activeLine + 1, allocData, dupeData);
         }
-
-        vscode.window.setStatusBarMessage("Done showing line details");
     }
 
     /**
@@ -144,6 +145,7 @@ export class ExtensionManager {
      */
     public stopShowingData(): void {
         this.highlighter.stopShowingData();
+        this.webviewTable.closeActivePanel();
     }
 
     /**
@@ -175,8 +177,8 @@ export class ExtensionManager {
                 preserveFocus: true,
                 preview: false
             });
-            const intLine = parseInt(parts[2]) - 1;
-            if (document.lineCount < parseInt(parts[2]) - 1) {
+            const intLine = parseInt(parts[1]) - 1;
+            if (document.lineCount < parseInt(parts[1]) - 1) {
                 vscode.window.showErrorMessage("Allocation line " + intLine + " out of bound");
                 return;
             }
@@ -252,7 +254,7 @@ export class ExtensionManager {
                         this.allocationFileMap.set(classRecord!.file, [lineRecord]);
                     }
                 } else {
-                    console.error("Allocation line " + l.class + ":" + l.line + " out of symbol range");
+                    console.error("Allocation line " + l.class + ":" + l.line + " out of range [" + classRecord!.range.start.line + 1 + ", " + classRecord!.range.end.line + 1 + "]");
                     continue;
                 }
             } else {

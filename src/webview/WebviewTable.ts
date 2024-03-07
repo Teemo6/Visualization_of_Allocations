@@ -36,10 +36,19 @@ export class WebviewTable {
     }
 
     /**
-     * @returns if some panel exists or not
+     * @returns if panel exists or not
      */
-    public hasActivePanel() {
+    public hasActivePanel(): boolean {
         return this.panel !== undefined;
+    }
+
+    /**
+     * @returns if panel exists or not
+     */
+    public closeActivePanel(): void {
+        if (this.panel !== undefined) {
+            this.panel.dispose();
+        }
     }
 
     /**
@@ -85,8 +94,8 @@ export class WebviewTable {
      * @returns HTML string
      */
     private getHTML(): string {
-        const scriptUri = this.panel!.webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri!, "src", "webview", "main.js"));
-        const cssUri = this.panel!.webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri!, "src", "webview", "main.css"));
+        const scriptUri = this.panel!.webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri!, "webview", "main.js"));
+        const cssUri = this.panel!.webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri!, "webview", "main.css"));
 
         // Run only scripts secured by random nonce
         let nonce = "";

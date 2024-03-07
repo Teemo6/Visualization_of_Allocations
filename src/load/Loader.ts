@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import path from 'path';
 
 import { ClassRecord } from '../model/lsp/ClassRecord';
 import { AllocationJSON, createAllocationJSON } from './AllocationJSON';
@@ -31,7 +32,7 @@ export class Loader {
             const userDefined = Constants.JSON_CONFIG.get<string>("defaultPath");
             if (userDefined) {
                 jsonPath = vscode.Uri.parse("file:/" + userDefined);
-                vscode.window.showInformationMessage("Memory Analyzer: Loading " + jsonPath.path);
+                vscode.window.setStatusBarMessage("Reading data from " + path.basename(jsonPath.path));
             } else {
                 await vscode.window.showOpenDialog({
                     canSelectMany: false,
@@ -46,7 +47,7 @@ export class Loader {
                 // Ask to save JSON path in workspace settings
                 if (Constants.JSON_CONFIG.get<boolean>("askToSavePath")) {
                     vscode.window.showInformationMessage(
-                        "Do you want to set " + jsonPath.path + " as default JSON path for this workspace?",
+                        "Do you want to set " + path.basename(jsonPath.path) + " as default JSON path for this workspace?",
                         "Yes",
                         "No",
                         "Don't ask again"
@@ -187,7 +188,7 @@ export class Loader {
                     break;
                 }
             }
-            if (!found){
+            if (!found) {
                 console.warn("Found no symbols in file " + f.path);
             }
         });

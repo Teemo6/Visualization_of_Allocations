@@ -1,0 +1,25 @@
+body {
+    font-size: 100%;
+}
+
+table, td, th {
+    border: 1px solid;
+    text-align: left;
+}
+
+table {
+    border-collapse: collapse;
+    width: fit-content;
+}
+
+td, th {
+    padding: 5px;
+}
+
+th {
+    border-bottom-width: 2px;
+}
+
+a {
+    cursor: pointer;
+}

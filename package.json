@@ -1,17 +1,24 @@
 {
   "name": "java-memory-analyzer",
-  "displayName": "Java Memory Analyzer",
-  "description": "Visualization tool for Java memory allocations",
-  "version": "0.0.1",
+  "displayName": "Memory Analyzer for Java",
+  "description": "Visualize line-by-line memory allocations and object duplicates data provided by external Memory Analyzer application.",
+  "version": "0.9.0",
   "engines": {
     "vscode": "^1.86.0"
   },
   "categories": [
-    "Debuggers"
+    "Visualization",
+    "Data Science"
   ],
+  "pricing": "Free",
   "icon": "icons/icon.png",
-  "author": "Štěpán Faragula",
-  "activationEvents": [],
+  "authors": [
+    "Štěpán Faragula"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations"
+  },
   "main": "./out/extension.js",
   "extensionDependencies": [
     "redhat.java"

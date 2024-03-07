@@ -21,7 +21,6 @@ export class Highlighter {
      */
     public loadAllFileData(fileAllocationMap: Map<string, AllocationRecord[]>): void {
         // Reset editor highlight
-        this.stopShowingData();
         this.highlightMap.clear();
 
         fileAllocationMap.forEach((data, file) => {
@@ -98,7 +97,7 @@ export class Highlighter {
 
         return true;
     }
-    
+
     /**
      * Hide all editor highlights, user active event response
      */
@@ -106,6 +105,7 @@ export class Highlighter {
         if (!this.showingData) {
             return;
         }
+        this.showingData = false;
 
         // Get all visible editors
         const editors = vscode.window.visibleTextEditors;
@@ -125,31 +125,38 @@ export class Highlighter {
     }
 
     /**
+     * @returns highlighter is showing/not showing data
+     */
+    public isShowingData(): boolean {
+        return this.showingData;
+    }
+
+    /**
      * Create decorator for HighlightData object
      * @param size sum of allocated size in Bytes on single line
      * @param count how many instances did the allocation
      * @param duplicates sum of all duplicates on single line
      * @param kind kind of allocation provided
-     * @returns 
+     * @returns line decorator
      */
     private createAllocationText(size: number, count: number, duplicates: number, kind: AllocationKind): vscode.TextEditorDecorationType {
         let bgColor, gutterPath, textColor;
         if (size === 0) {
             bgColor = Constants.COLOR_CONFIG.get<string>("emptyBackground");
             textColor = Constants.COLOR_CONFIG.get<string>("emptyText");
-            gutterPath = Constants.NO_ALLOCATION_GUTTER;
+            // gutterPath = Constants.NO_ALLOCATION_GUTTER;
         } else if (kind === AllocationKind.LINE) {
             bgColor = Constants.COLOR_CONFIG.get<string>("lineBackground");
             textColor = Constants.COLOR_CONFIG.get<string>("lineText");
-            gutterPath = Constants.LINE_ALLOCATION_GUTTER;
+            // gutterPath = Constants.LINE_ALLOCATION_GUTTER;
         } else if (kind === AllocationKind.METHOD) {
             bgColor = Constants.COLOR_CONFIG.get<string>("methodBackground");
             textColor = Constants.COLOR_CONFIG.get<string>("methodText");
-            gutterPath = Constants.METHOD_ALLOCATION_GUTTER;
+            // gutterPath = Constants.METHOD_ALLOCATION_GUTTER;
         } else {
             bgColor = Constants.COLOR_CONFIG.get<string>("classBackground");
             textColor = Constants.COLOR_CONFIG.get<string>("classText");
-            gutterPath = Constants.CLASS_ALLOCATION_GUTTER;
+            // gutterPath = Constants.CLASS_ALLOCATION_GUTTER;
         }
 
         let text = " Total of " + Intl.NumberFormat(Constants.NUMBER_LOCALE).format(size) + " Bytes";
@@ -165,8 +172,8 @@ export class Highlighter {
             backgroundColor: bgColor,
             overviewRulerColor: bgColor,
             overviewRulerLane: vscode.OverviewRulerLane.Full,
-            gutterIconPath: gutterPath,
-            gutterIconSize: "contain",
+            // gutterIconPath: gutterPath,
+            // gutterIconSize: "contain",
             after: {
                 contentText: text,
                 color: textColor

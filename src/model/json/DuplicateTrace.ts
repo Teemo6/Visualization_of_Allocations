@@ -46,6 +46,6 @@ export class DuplicateTrace {
      * @param exp format as following: \<package with class\>"deli"\<method\>"deli"\<line\> 
      */
     public getJavaSource(): string {
-        return this.class + Constants.DUPLICATE_DETAIL_DELI + this.method + Constants.DUPLICATE_DETAIL_DELI + this.line;
+        return this.class + Constants.DUPLICATE_DETAIL_DELI + this.line;
     }
 }
