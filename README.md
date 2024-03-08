@@ -1,6 +1,8 @@
 # Memory Analyzer for Java
 Visualize line-by-line memory allocations and object duplicates data provided by external [Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser).
-![Memory Analyzer demo](readme/demo.gif)
+
+## Demo
+![Memory Analyzer demo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/demo.gif?ref_type=heads)
 
 ## Requirements
 Requires [Language Support for Java(TM) by Red Hat](https://marketplace.visualstudio.com/items?itemName=redhat.java) extension to run.
