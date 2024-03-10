@@ -1,0 +1,23 @@
+.vscode/**
+.vscode-test/**
+src/**
+.gitignore
+.yarnrc
+vsc-extension-quickstart.md
+**/tsconfig.json
+**/.eslintrc.json
+**/*.map
+**/*.ts
+**/.vscode-test.*
+
+data/**
+PluginDemo/**
+icons/class_allocation.svg
+icons/icon.svg
+icons/line_allocation.svg
+icons/method_allocation.svg
+icons/no_allocation.svg
+
+# Exception
+!src/webview/main.css
+!src/webview/main.js

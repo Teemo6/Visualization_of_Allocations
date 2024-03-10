@@ -25,11 +25,11 @@ export class Loader {
     public async loadJSONFile(): Promise<boolean> {
         // Reset local data
         this.loadedJSON = undefined;
+        let jsonPath: vscode.Uri = vscode.Uri.file("");
 
         try {
             // Load file according to settings or open file dialog 
-            let jsonPath: vscode.Uri = vscode.Uri.file("");
-            const userDefined = Constants.JSON_CONFIG.get<string>("defaultPath");
+            const userDefined = vscode.workspace.getConfiguration(Constants.CONFIG_JSON).get<string>("defaultPath");
             if (userDefined) {
                 jsonPath = vscode.Uri.parse("file:/" + userDefined);
                 vscode.window.setStatusBarMessage("Reading data from " + path.basename(jsonPath.path));
@@ -44,21 +44,6 @@ export class Loader {
                         return false;
                     }
                 });
-                // Ask to save JSON path in workspace settings
-                if (Constants.JSON_CONFIG.get<boolean>("askToSavePath")) {
-                    vscode.window.showInformationMessage(
-                        "Do you want to set " + path.basename(jsonPath.path) + " as default JSON path for this workspace?",
-                        "Yes",
-                        "No",
-                        "Don't ask again"
-                    ).then(answer => {
-                        if (answer === "Yes") {
-                            Constants.JSON_CONFIG.update("defaultPath", jsonPath.fsPath, vscode.ConfigurationTarget.Workspace);
-                        } else if (answer === "Don't ask again") {
-                            Constants.JSON_CONFIG.update("askToSavePath", false, vscode.ConfigurationTarget.Workspace);
-                        }
-                    });
-                }
             }
             const rawData = await vscode.workspace.fs.readFile(jsonPath);
             this.loadedJSON = await JSON.parse(rawData.toString());
@@ -72,6 +57,23 @@ export class Loader {
         if (!this.loadedJSON) {
             vscode.window.showErrorMessage("JSON file has unexpected format");
             return false;
+        }
+
+        // Ask to save JSON path in workspace settings
+        if (vscode.workspace.getConfiguration(Constants.CONFIG_JSON).get<boolean>("askToSavePath")) {
+            vscode.window.showInformationMessage(
+                "Do you want to set " + path.basename(jsonPath.path) + " as default JSON path for this workspace?",
+                "Yes",
+                "No",
+                "Don't ask again"
+            ).then(answer => {
+                if (answer === "Yes") {
+                    vscode.workspace.getConfiguration(Constants.CONFIG_JSON).update("defaultPath", jsonPath.fsPath, vscode.ConfigurationTarget.Workspace);
+                    vscode.workspace.getConfiguration(Constants.CONFIG_JSON).update("askToSavePath", false, vscode.ConfigurationTarget.Workspace);
+                } else if (answer === "Don't ask again") {
+                    vscode.workspace.getConfiguration(Constants.CONFIG_JSON).update("askToSavePath", false, vscode.ConfigurationTarget.Workspace);
+                }
+            });
         }
         return true;
     }

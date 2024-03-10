@@ -71,11 +71,13 @@ export class WebviewTable {
     /**
      * Send selected line, allocation and duplicate data to HTML and show detail tables
      * @param line selected line, indexed from 1
+     * @param kind allocation kind, accepts: line, method, class
+     * @param name allocation name, used only for method and class
      * @param allocData allocation information
      * @param dupeData duplicate information
      * @returns message has been successfully/unsuccessfully receieved
      */
-    public sendDataToTable(line: number, allocData: { name: string, size: number, count: number }[], dupeData: { name: string, size: number, count: number, source: string }[]): boolean {
+    public sendDataToTable(line: number, kind: string, name: string, allocData: { name: string, size: number, count: number }[], dupeData: { name: string, size: number, count: number, source: string }[]): boolean {
         if (this.panel === undefined) {
             return false;
         }
@@ -83,6 +85,8 @@ export class WebviewTable {
         this.panel!.webview.postMessage({
             type: "data",
             line: line,
+            kind: kind,
+            name: name,
             allocData: allocData,
             dupeData: dupeData
         });
@@ -94,8 +98,8 @@ export class WebviewTable {
      * @returns HTML string
      */
     private getHTML(): string {
-        const scriptUri = this.panel!.webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri!, "webview", "main.js"));
-        const cssUri = this.panel!.webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri!, "webview", "main.css"));
+        const scriptUri = this.panel!.webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri!, "src", "webview", "main.js"));
+        const cssUri = this.panel!.webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri!, "src", "webview", "main.css"));
 
         // Run only scripts secured by random nonce
         let nonce = "";
@@ -115,6 +119,7 @@ export class WebviewTable {
                 <link href="${cssUri}" rel="stylesheet">
             </head>
             <body>
+                <div id="header"></div>
                 <div id="alloc"></div>
                 <div id="dupe"></div>
                 <script nonce="${nonce}" src="${scriptUri}"></script>

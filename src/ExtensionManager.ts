@@ -94,25 +94,55 @@ export class ExtensionManager {
             return;
         }
 
+        // Check activated highlighter
+        if (!this.highlighter.isShowingData()) {
+            vscode.window.showErrorMessage("Call 'Show data' first");
+            return;
+        }
+
         // Select active line
-        const activeLine = editor!.selection.active.line;
+        const activeLineNumber = editor!.selection.active.line;
         const records = this.allocationFileMap.get(editor!.document.uri.path);
         if (!records) {
             vscode.window.showErrorMessage("Load JSON first");
             return;
         }
 
-        // Check activated highlighter
-        if (!this.highlighter.isShowingData()){
-            vscode.window.showErrorMessage("Call 'Show data' first");
-            return;
-        }
-
         // Gather all active line data
         const lineRecords: AllocationRecord[] = [];
+        let start = Number.MAX_SAFE_INTEGER;
+        let end = Number.MIN_SAFE_INTEGER;
+        let activeLineKind = AllocationKind.LINE;
+        let activeLineName = "";
         for (const r of records!) {
-            if (r.kind === AllocationKind.LINE && r.line === activeLine) {
-                lineRecords.push(r);
+            if (r.line === activeLineNumber) {
+                activeLineKind = r.kind;
+                activeLineName = r.name;
+                if (activeLineKind === AllocationKind.LINE) {
+                    lineRecords.push(r);
+                } else {
+                    activeLineKind = r.kind;
+                    activeLineName = r.name;
+                    if (r.range !== undefined) {
+                        start = r.range.start.line + 1;
+                        end = r.range.end.line + 1;
+                    }
+                }
+                break;
+            }
+        }
+
+        // Get child data of class / method
+        if (start !== Number.MAX_SAFE_INTEGER && end !== Number.MIN_SAFE_INTEGER) {
+            for (const r of records!) {
+                if (start < r.line && r.line < end) {
+                    if (activeLineKind === AllocationKind.CLASS && r.kind === AllocationKind.METHOD) {
+                        lineRecords.push(r);
+                    }
+                    if (activeLineKind === AllocationKind.METHOD && r.kind === AllocationKind.LINE) {
+                        lineRecords.push(r);
+                    }
+                }
             }
         }
 
@@ -122,38 +152,32 @@ export class ExtensionManager {
         }
 
         // Send data to webview
-        if (lineRecords.length === 0 || lineRecords[0].kind !== AllocationKind.LINE) {
-            this.webviewTable.sendNothingToTable(activeLine + 1);
+        if (lineRecords.length === 0) {
+            this.webviewTable.sendNothingToTable(activeLineNumber + 1);
         } else {
-            const allocData: { name: string, size: number, count: number }[] = [];
+            const allocData: { name: string, size: number, count: number, source: string }[] = [];
             const dupeData: { name: string, size: number, count: number, source: string }[] = [];
 
             lineRecords.forEach(l => {
-                allocData.push({ name: l.name, size: l.size, count: l.count });
+                allocData.push({ name: l.name, size: l.size, count: l.count, source: l.getJavaSource() });
                 l.duplicates.forEach(t => {
                     dupeData.push({ name: l.name, size: l.size, count: t.count, source: t.getJavaSource() });
                 });
             });
             dupeData.sort((a, b) => a.source.localeCompare(b.source));
 
-            this.webviewTable.sendDataToTable(activeLine + 1, allocData, dupeData);
+            this.webviewTable.sendDataToTable(activeLineNumber + 1, activeLineKind, activeLineName, allocData, dupeData);
         }
     }
 
     /**
-     * Hide highlight data
+     * Toggle between showing and not showing data
      */
-    public stopShowingData(): void {
-        this.highlighter.stopShowingData();
-        this.webviewTable.closeActivePanel();
-    }
-
-    /**
-     * Show highlight data (if any)
-     */
-    public startShowingData(): void {
-        if (!this.highlighter.startShowingData()) {
-            vscode.window.showErrorMessage("No data to show");
+    public toggleShowingData(): void {
+        if (this.highlighter.isShowingData()) {
+            this.stopShowingData();
+        } else {
+            this.startShowingData();
         }
     }
 
@@ -162,6 +186,17 @@ export class ExtensionManager {
      */
     public highlightEditors(): void {
         this.highlighter.highlightEditors();
+    }
+
+    /**
+     * Reload highlight
+     */
+    public reloadHighlights(): void {
+        if (this.highlighter.isShowingData()) {
+            this.stopShowingData();
+            this.highlighter.loadAllFileData(this.allocationFileMap);
+            this.startShowingData();
+        }
     }
 
     /**
@@ -174,8 +209,7 @@ export class ExtensionManager {
             const document = await vscode.workspace.openTextDocument(this.classFileMap.get(parts[0])!.file);
             const editor = await vscode.window.showTextDocument(document, {
                 viewColumn: vscode.ViewColumn.One,
-                preserveFocus: true,
-                preview: false
+                preserveFocus: false
             });
             const intLine = parseInt(parts[1]) - 1;
             if (document.lineCount < parseInt(parts[1]) - 1) {
@@ -185,6 +219,11 @@ export class ExtensionManager {
             const cursorPos = new vscode.Selection(new vscode.Position(intLine, 0), new vscode.Position(intLine, 0));
             editor.selection = cursorPos;
             editor.revealRange(cursorPos);
+
+            // Show line details immediately
+            if (vscode.workspace.getConfiguration(Constants.CONFIG_DETAILS).get<string>("goToLineImmediately")){
+                this.showDetail();
+            }
         } else {
             console.error("Cannot find file " + parts[0]);
             vscode.window.showErrorMessage("Cannot find file " + parts[0]);
@@ -245,7 +284,7 @@ export class ExtensionManager {
                             }
                         }
                     }
-                    const lineRecord: AllocationRecord = new AllocationRecord(l.name, editorLine, AllocationKind.LINE);
+                    const lineRecord: AllocationRecord = new AllocationRecord(l.name, l.class, editorLine, AllocationKind.LINE);
                     lineRecord.size = l.size;
                     lineRecord.count = l.count;
                     if (this.allocationFileMap.has(classRecord!.file)) {
@@ -297,8 +336,9 @@ export class ExtensionManager {
         }
 
         // Fill allocationFileMap with aggregated method and class info
-        this.classFileMap.forEach(c => {
-            const classRecord: AllocationRecord = new AllocationRecord(c.name, c.declared, AllocationKind.CLASS);
+        this.classFileMap.forEach((c, c_key) => {
+            const classRecord: AllocationRecord = new AllocationRecord(c_key, c_key, c.declared, AllocationKind.CLASS);
+            classRecord.range = c.range;
             classRecord.size = c.allocated;
             if (this.allocationFileMap.has(c.file)) {
                 this.allocationFileMap.get(c.file)!.push(classRecord);
@@ -306,16 +346,35 @@ export class ExtensionManager {
                 this.allocationFileMap.set(c.file, [classRecord]);
             }
             c.methods.forEach(m => {
-                const methodRecord: AllocationRecord = new AllocationRecord(m.name, m.declared, AllocationKind.METHOD);
+                const methodRecord: AllocationRecord = new AllocationRecord(m.name, c_key, m.declared, AllocationKind.METHOD);
+                methodRecord.range = m.range;
                 methodRecord.size = m.allocated;
                 this.allocationFileMap.get(c.file)!.push(methodRecord);
             });
             c.constructors.forEach(con => {
-                const methodRecord: AllocationRecord = new AllocationRecord(con.name, con.declared, AllocationKind.METHOD);
-                methodRecord.size = con.allocated;
-                this.allocationFileMap.get(c.file)!.push(methodRecord);
+                const constructorRecord: AllocationRecord = new AllocationRecord(con.name, c_key, con.declared, AllocationKind.METHOD);
+                constructorRecord.range = con.range;
+                constructorRecord.size = con.allocated;
+                this.allocationFileMap.get(c.file)!.push(constructorRecord);
             });
         });
         return true;
+    }
+
+    /**
+     * Hide highlight data
+     */
+    private stopShowingData(): void {
+        this.highlighter.stopShowingData();
+        this.webviewTable.closeActivePanel();
+    }
+
+    /**
+     * Show highlight data (if any)
+     */
+    private startShowingData(): void {
+        if (!this.highlighter.startShowingData()) {
+            vscode.window.showErrorMessage("No data to show");
+        }
     }
 }

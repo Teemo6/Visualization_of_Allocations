@@ -140,22 +140,23 @@ export class Highlighter {
      * @returns line decorator
      */
     private createAllocationText(size: number, count: number, duplicates: number, kind: AllocationKind): vscode.TextEditorDecorationType {
-        let bgColor, gutterPath, textColor;
+        let bgColor, textColor;
+        // let gutterPath;
         if (size === 0) {
-            bgColor = Constants.COLOR_CONFIG.get<string>("emptyBackground");
-            textColor = Constants.COLOR_CONFIG.get<string>("emptyText");
+            bgColor = vscode.workspace.getConfiguration(Constants.CONFIG_COLOR).get<string>("emptyBackground");
+            textColor = vscode.workspace.getConfiguration(Constants.CONFIG_COLOR).get<string>("emptyText");
             // gutterPath = Constants.NO_ALLOCATION_GUTTER;
         } else if (kind === AllocationKind.LINE) {
-            bgColor = Constants.COLOR_CONFIG.get<string>("lineBackground");
-            textColor = Constants.COLOR_CONFIG.get<string>("lineText");
+            bgColor = vscode.workspace.getConfiguration(Constants.CONFIG_COLOR).get<string>("lineBackground");
+            textColor = vscode.workspace.getConfiguration(Constants.CONFIG_COLOR).get<string>("lineText");
             // gutterPath = Constants.LINE_ALLOCATION_GUTTER;
         } else if (kind === AllocationKind.METHOD) {
-            bgColor = Constants.COLOR_CONFIG.get<string>("methodBackground");
-            textColor = Constants.COLOR_CONFIG.get<string>("methodText");
+            bgColor = vscode.workspace.getConfiguration(Constants.CONFIG_COLOR).get<string>("methodBackground");
+            textColor = vscode.workspace.getConfiguration(Constants.CONFIG_COLOR).get<string>("methodText");
             // gutterPath = Constants.METHOD_ALLOCATION_GUTTER;
         } else {
-            bgColor = Constants.COLOR_CONFIG.get<string>("classBackground");
-            textColor = Constants.COLOR_CONFIG.get<string>("classText");
+            bgColor = vscode.workspace.getConfiguration(Constants.CONFIG_COLOR).get<string>("classBackground");
+            textColor = vscode.workspace.getConfiguration(Constants.CONFIG_COLOR).get<string>("classText");
             // gutterPath = Constants.CLASS_ALLOCATION_GUTTER;
         }
 

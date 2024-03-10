@@ -1,8 +1,8 @@
 {
   "name": "java-memory-analyzer",
   "displayName": "Memory Analyzer for Java",
-  "description": "Visualize line-by-line memory allocations and object duplicates data provided by external Memory Analyzer application.",
-  "version": "0.9.0",
+  "description": "Visualize object memory allocations and duplicates line-by-line.",
+  "version": "0.9.1",
   "engines": {
     "vscode": "^1.86.0"
   },
@@ -30,16 +30,12 @@
         "title": "Memory Analyzer: Load JSON file"
       },
       {
+        "command": "java-memory-analyzer.toggleShowing",
+        "title": "Memory Analyzer: Toggle visualization"
+      },
+      {
         "command": "java-memory-analyzer.showDetail",
         "title": "Memory Analyzer: Show line details"
-      },
-      {
-        "command": "java-memory-analyzer.stopShowing",
-        "title": "Memory Analyzer: Hide data"
-      },
-      {
-        "command": "java-memory-analyzer.startShowing",
-        "title": "Memory Analyzer: Show data"
       }
     ],
     "menus": {
@@ -60,7 +56,12 @@
         "java-memory-analyzer.json.askToSavePath": {
           "type": "boolean",
           "default": true,
-          "description": "Ask if you want to save file path for current workspace when loading JSON file without path set"
+          "description": "When loading JSON file without path set in these settings, ask if you want to save path for current workspace"
+        },
+        "java-memory-analyzer.details.goToLineImmediately": {
+          "type": "boolean",
+          "default": true,
+          "description": "Clicking link in details table will automatically show new details about referenced line"
         },
         "java-memory-analyzer.color.lineBackground": {
           "type": "string",
@@ -95,12 +96,12 @@
         "java-memory-analyzer.color.emptyBackground": {
           "type": "string",
           "default": "rgba(150, 150, 150, 0.2)",
-          "description": "Background color of no allocation for method / class"
+          "description": "Background color of no allocation (only for method/class)"
         },
         "java-memory-analyzer.color.emptyText": {
           "type": "string",
           "default": "rgba(150, 150, 150, 0.6)",
-          "description": "Text color of no allocation for method / class"
+          "description": "Text color of no allocation (only for method/class)"
         }
       }
     }

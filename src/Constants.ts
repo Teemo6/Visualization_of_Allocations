@@ -1,18 +1,19 @@
-import * as vscode from 'vscode';
-import path from 'path';
-
 /**
  * Constants used all around the extension
  */
 export class Constants {
     /**
-     * Load user color settings
+     * User color settings
      */
-    public static COLOR_CONFIG = vscode.workspace.getConfiguration("java-memory-analyzer.color");
+    public static CONFIG_COLOR = "java-memory-analyzer.color";
     /**
-     * Load user json settings
+     * User json settings
      */
-    public static JSON_CONFIG = vscode.workspace.getConfiguration("java-memory-analyzer.json");
+    public static CONFIG_JSON = "java-memory-analyzer.json";
+    /**
+     * User details settings
+     */
+    public static CONFIG_DETAILS = "java-memory-analyzer.details";
     /**
      * LSP extension provider
      */

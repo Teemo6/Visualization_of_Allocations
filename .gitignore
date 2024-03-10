@@ -3,5 +3,4 @@ node_modules
 .vscode-test
 data
 out
-.vscodeignore
 .vscode-test.mjs
