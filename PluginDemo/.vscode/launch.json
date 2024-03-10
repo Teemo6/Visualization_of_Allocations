@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "type": "java",
+            "name": "Run Analyzer",
+            "request": "launch",
+            "mainClass": "main.Main",
+            "vmArgs": [
+                "--add-opens", "java.base/java.util=ALL-UNNAMED",
+                "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+                "--add-opens", "java.base/java.io=ALL-UNNAMED",
+                "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
+                "-javaagent:path/to/memory/analyzer.jar",
+                "-jar", "path/to/this/project.jar"
+            ],
+            "args": [],
+            "projectName": "PluginDemo",
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false
+        },
+    ]
+}
