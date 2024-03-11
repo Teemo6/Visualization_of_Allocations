@@ -113,7 +113,8 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "lint-fix": "eslint . --ext .ts --fix",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "pack": "vsce package --out MemoryAnalyzer.vsix"
   },
   "devDependencies": {
     "@types/vscode": "^1.86.0",

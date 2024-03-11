@@ -23,12 +23,14 @@ Before using this extension, ensure that [Language Support for Java(TM) by Red H
 4. Click **Views and more actions...**
 5. Select **Install from VSIX...**
 
-<img src="https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/install.gif?ref_type=heads" width=60% height=60%>
+<img src="https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/install.gif?ref_type=heads" width=50% height=50%>
 
 **Note:** 
 - After downloading the VSIX file, you can also install the extension from the terminal with the following command:
 
-`code --install-extension path/to/extension.vsix`
+  ```
+  code --install-extension path/to/extension.vsix
+  ```
 
 ## How to use 
 1. Create a JAR archive of your Java project and run it with an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser), which will generate a `data.json` file.
@@ -77,7 +79,8 @@ Before using this extension, ensure that [Language Support for Java(TM) by Red H
 **Tip:** 
 - All colors accept a string in the [CSS color format](https://www.w3schools.com/css/css_colors.asp).
 
-## Known Issues
+## Known Issues and limitations
+- The format of JSON file is same as an output of an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser), no other format is supported.
 - If you try to run **Load JSON file** without the language support fully loaded, some files will be missing allocation data.
 - **Show line details** panel must be manually resized, as there is no way to change its width within Visual Studio Code API.
 - No support for visualization of nested classes, nested methods and enumerations.
