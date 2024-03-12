@@ -118,9 +118,9 @@ export class Highlighter {
 
         // Add highlights according to the file map
         for (const editor of editors) {
-            const path = editor.document.uri.path;
-            if (this.highlightMap.has(path)) {
-                this.highlightMap.get(path)!.forEach(e => {
+            const normalizedPath = path.normalize(editor.document.uri.path);
+            if (this.highlightMap.has(normalizedPath)) {
+                this.highlightMap.get(normalizedPath)!.forEach(e => {
                     editor.setDecorations(e.decorator, []);
                 });
             }
