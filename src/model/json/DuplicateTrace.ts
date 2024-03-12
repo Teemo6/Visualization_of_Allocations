@@ -5,7 +5,7 @@ import { Constants } from "../../Constants";
  */
 export class DuplicateTrace {
     /**
-     * Absolute string file path in current workspace
+     * Absolute string file path in current workspace, normalized with path.normalize()
      */
     public file: string;
     /**
@@ -27,7 +27,7 @@ export class DuplicateTrace {
 
     /**
      * Assign all provided parameters to object values
-     * @param file Absolute string file path in current workspace
+     * @param file Absolute string file path in current workspace, normalized with path.normalize()
      * @param clazz Class name with packages: myPackage.myOtherPackage.myClass
      * @param method Name of method without parameters: myMethod
      * @param line Line number indexed from 1

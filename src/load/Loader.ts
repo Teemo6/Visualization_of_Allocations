@@ -168,9 +168,9 @@ export class Loader {
 
             fileClasses.forEach(c => {
                 if (!filePackage) {
-                    this.classFileMap.set(c.name, new ClassRecord(file.path, filePackage, c.name, c.range, c.declared, c.methods, c.constructors));
+                    this.classFileMap.set(c.name, new ClassRecord(path.normalize(file.path), filePackage, c.name, c.range, c.declared, c.methods, c.constructors));
                 } else {
-                    this.classFileMap.set(filePackage + "." + c.name, new ClassRecord(file.path, filePackage, c.name, c.range, c.declared, c.methods, c.constructors));
+                    this.classFileMap.set(filePackage + "." + c.name, new ClassRecord(path.normalize(file.path), filePackage, c.name, c.range, c.declared, c.methods, c.constructors));
                 }
             });
         }
@@ -182,18 +182,29 @@ export class Loader {
         }
 
         // Check if files contain some symbols
+        const noSymbols: string[] = [];
         files.forEach(f => {
             let found = false;
             for (const val of this.classFileMap.values()) {
-                if (f.path === val.file) {
+                if (path.normalize(f.path) === val.file) {
                     found = true;
                     break;
                 }
             }
             if (!found) {
+                noSymbols.push(f.path);
                 console.warn("Found no symbols in file " + f.path);
             }
         });
+
+        // Let user know if some files are missing Java symbols
+        if (noSymbols.length !== 0) {
+            let which: string = "";
+            noSymbols.forEach(s => {
+                which += path.basename(s);
+            });
+            vscode.window.showWarningMessage("Found no Java symbols in files: " + which);
+        }
 
         return true;
     }

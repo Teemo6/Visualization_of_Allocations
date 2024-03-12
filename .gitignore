@@ -4,10 +4,6 @@ node_modules
 data
 out
 .vscode-test.mjs
-PluginDemo/target/classes
-PluginDemo/target/generated-sources
-PluginDemo/target/maven-archiver
-PluginDemo/target/maven-status
-PluginDemo/target/test-classes
+PluginDemo/target
 
 !PluginDemo/.vscode/launch.json

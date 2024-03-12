@@ -17,7 +17,7 @@ export class ClassRecord {
 
     /**
      * Assign all provided parameters to object values
-     * @param file Absolute string file path in current workspace
+     * @param file Absolute string file path in current workspace, normalized with path.normalize()
      * @param packag Class packages separated by dot (.)
      * @param name Class name
      * @param range Lines where the symbol is

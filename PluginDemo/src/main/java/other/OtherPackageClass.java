@@ -10,7 +10,7 @@ public class OtherPackageClass {
     }
 
     public static void outsidePackageAloneTest(int val, int count){
-        // 100 allocations, 100 duplicates
+        // 200 allocations, 100 duplicates
         for (int i = 0; i < count; i++){
             new OtherTestingObject(val);
         }

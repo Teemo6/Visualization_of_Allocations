@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 import { Loader } from './load/Loader';
 import { Highlighter } from './highlight/Highlighter';
@@ -96,15 +97,15 @@ export class ExtensionManager {
 
         // Check activated highlighter
         if (!this.highlighter.isShowingData()) {
-            vscode.window.showErrorMessage("Call 'Show data' first");
+            vscode.window.showErrorMessage("Load JSON and toggle the visualization on first");
             return;
         }
 
         // Select active line
         const activeLineNumber = editor!.selection.active.line;
-        const records = this.allocationFileMap.get(editor!.document.uri.path);
+        const records = this.allocationFileMap.get(path.normalize(editor!.document.uri.path));
         if (!records) {
-            vscode.window.showErrorMessage("Load JSON first");
+            vscode.window.showErrorMessage("Cannot find any data for the selected file");
             return;
         }
 
@@ -120,7 +121,7 @@ export class ExtensionManager {
                 activeLineName = r.name;
                 if (activeLineKind === AllocationKind.LINE) {
                     lineRecords.push(r);
-                } else {
+                } else if (r.size !== 0) {
                     activeLineKind = r.kind;
                     activeLineName = r.name;
                     if (r.range !== undefined) {
@@ -221,7 +222,7 @@ export class ExtensionManager {
             editor.revealRange(cursorPos);
 
             // Show line details immediately
-            if (vscode.workspace.getConfiguration(Constants.CONFIG_DETAILS).get<string>("goToLineImmediately")){
+            if (vscode.workspace.getConfiguration(Constants.CONFIG_DETAILS).get<string>("goToLineImmediately")) {
                 this.showDetail();
             }
         } else {

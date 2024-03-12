@@ -7,11 +7,12 @@ Visualize object memory allocations and duplicates line-by-line.
 - Visualize data provided by an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser).
 - Highlight lines that allocated memory on the heap at runtime.
 - Display how many objects and how much memory has each line allocated.
+- Aggregate line data to see a method and class total allocation size.
 - Show table containing detailed information with interactive links.
 - Trace duplicates to their sources.
 - Customize highlight color settings.
 
-![Memory Analyzer demo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/demo.gif?ref_type=heads)
+![Extension demo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/demo.gif?ref_type=heads)
 
 ## Requirements
 Plugin is made for [Visual Studio Code](https://code.visualstudio.com/) version 1.86.0 and newer.
@@ -33,18 +34,18 @@ To build the souce code yourself, you need to have a [Node.js](https://nodejs.or
   npm install
   ```
 
- After you have successfully built the project, you will have to create VSIX file using `vsce` (Visual Studio Code extension) tool. Do the following:
+ After you have successfully built the project, you will have to create VSIX file using `vsce` (Visual Studio Code extension). Do the following:
 
 1. To install the `vsce` tool, run:
   ```
   npm install -g @vscode/vsce
   ```
-2. In the root folder of the built extension, run:
+1. In the root folder of the built extension, run:
   ```
   vsce package
   ```
 
-Doing the steps above will provide you with `java-memory-analyzer.vsix`.
+To build the extension you can also call a premade script `npm run pack-vsix`, which will create `release/java-memory-analyzer.vsix`. This method will still require you to install the `vsce` tool in the step 1
 
 ### Installing the extension in Visual Studio Code
 If you have the VSIX file ready, you can install the extension inside Visual Studio Code:
@@ -56,7 +57,7 @@ If you have the VSIX file ready, you can install the extension inside Visual Stu
 <img src="https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/install.gif?ref_type=heads" width=50% height=50%>
 
 **Note:** 
-- After obtainig the VSIX file, you can also install the extension from the terminal with the following command:
+- After obtaining the VSIX file, you can also install the extension from the terminal with the following command:
 
   ```
   code --install-extension path/to/extension.vsix
@@ -69,15 +70,13 @@ If you have the VSIX file ready, you can install the extension inside Visual Stu
 4. To show currently selected line details, run **Memory Analyzer: Show line details**.
 5. Clicking on the link of the details table will move the cursor to the position of that particular allocation.
 
-You can read more in the section **Commands**.
+**Tip:**
+- Commands can be found in context menu of using `ctrl + shift + P`.
 
 ## PluginDemo
-This repository also contains [PluginDemo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/PluginDemo?ref_type=heads), which is Java project that can be built with Maven using `mvn clean install`
+This repository contains [PluginDemo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/PluginDemo?ref_type=heads), which is Java project that can be built with [Maven](https://maven.apache.org/) using `mvn clean install`. The project comes with generated `data.json` that is ready to use for the demonstration of this extension.
 
-[PluginDemo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/PluginDemo?ref_type=heads) comes with gerenated `java-agent-with-dependencies.jar`, which is compiled [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser) and generated `data.json` that is ready to use for small demonstration of this extension.
-
-You can create a run configuration similliar to `.vscode/launch.json` of to easily generate a JSON file within Visual Studio Code (this will require more extensions for full Visual Studio Code Java IDE).
-
+In order to run an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser) within Visual Studio Code, you can create a run configuration similliar to `.vscode/launch.json`. This action will require a compiled JAR file of the memory analyzer, which can be obtained by following the README in the project repository.
 
 ## Commands
 - `Memory Analyzer: Load JSON file`: load the generated JSON file
@@ -86,11 +85,10 @@ You can create a run configuration similliar to `.vscode/launch.json` of to easi
   * this option is also available under mouse right-click context menu
 
 **Tip:**
-- Commands can be found in context menu of using `ctrl + shift + P`.
 - It is recommended to map commands to key bindings for personal convenience, refer to the [official Visual Studio Code documentation](https://code.visualstudio.com/docs/getstarted/keybindings).
 
 ## Settings
-Settings in Visual Studio Code can be accessed with default shortcut `ctrl + ,`, after that search for `java-memory-analyzer`
+Settings in the Visual Studio Code can be accessed with a default shortcut `ctrl + ,`, where you can search for `java-memory-analyzer`.
 
 ### JSON load settings
 - `java-memory-analyzer.json.defaultPath`: absolute path where the JSON is located. If not empty, this path will be always have priority over the popup window
@@ -116,9 +114,14 @@ Settings in Visual Studio Code can be accessed with default shortcut `ctrl + ,`,
 
 **Tip:** 
 - All colors accept a string in the [CSS color format](https://www.w3schools.com/css/css_colors.asp).
+- If you have the visualization toggled on, the changes can be seen immediately.
+
+![Color change](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/color.gif?ref_type=heads)
 
 ## Known Issues and limitations
-- The format of JSON file is same as an output of an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser), no other format is supported.
-- If you try to run **Load JSON file** without the language support fully loaded, some files will be missing allocation data.
+- The format of JSON file is same as an output of an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser), no other JSON format is supported.
+- The visualization can only show as much data as it is provided with the JSON file. 
+- Extension does not actually detect the keyword `new` on the line, it only highlights lines according to provided file.
+- If you try to run **Load JSON file** without the language support fully loaded, some files may be missing allocation data. If this problem persists, the best solution is to restart Visual Studio Code.
 - **Show line details** panel must be manually resized, as there is no way to change its width within Visual Studio Code API.
 - No support for visualization of nested classes, nested methods and enumerations.

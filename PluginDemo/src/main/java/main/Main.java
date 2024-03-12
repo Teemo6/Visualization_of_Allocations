@@ -82,10 +82,10 @@ public class Main {
         OtherPackageClass.outsidePackageAloneTest(13, 100);
 
         // Go to implementation
-        // 200 allocations, 300 duplicates
-        OtherPackageClass.outsidePackageTest(4, 100);
-        for (int i = 0; i < 200; i++){
-            new TestingObject(4);
+        // 100 allocations, 300 duplicates
+        OtherPackageClass.outsidePackageTest(13, 200);
+        for (int i = 0; i < 100; i++){
+            new TestingObject(13);
         }
     }
 }
