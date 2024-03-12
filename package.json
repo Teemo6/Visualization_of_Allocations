@@ -114,7 +114,7 @@
     "lint": "eslint src --ext ts",
     "lint-fix": "eslint . --ext .ts --fix",
     "test": "vscode-test",
-    "pack": "vsce package --out MemoryAnalyzer.vsix"
+    "pack-vsix": "vsce package --out release/java-memory-analyzer.vsix"
   },
   "devDependencies": {
     "@types/vscode": "^1.86.0",

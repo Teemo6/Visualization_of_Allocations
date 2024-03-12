@@ -12,8 +12,8 @@
                 "--add-opens", "java.base/java.lang=ALL-UNNAMED",
                 "--add-opens", "java.base/java.io=ALL-UNNAMED",
                 "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
-                "-javaagent:path/to/memory/analyzer.jar",
-                "-jar", "path/to/this/project.jar"
+                "-javaagent:agent-jar-with-dependencies.jar",       // JAR with memory analyzer
+                "-jar", "target/app.jar"                            // JAR of this project
             ],
             "args": [],
             "projectName": "PluginDemo",

@@ -14,19 +14,49 @@ Visualize object memory allocations and duplicates line-by-line.
 ![Memory Analyzer demo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/demo.gif?ref_type=heads)
 
 ## Requirements
-Before using this extension, ensure that [Language Support for Java(TM) by Red Hat](https://marketplace.visualstudio.com/items?itemName=redhat.java) is also installed.
+Plugin is made for [Visual Studio Code](https://code.visualstudio.com/) version 1.86.0 and newer.
+
+Before using, ensure that [Language Support for Java(TM) by Red Hat](https://marketplace.visualstudio.com/items?itemName=redhat.java) is also installed.
 
 ## How to install
-1. Go to the [release folder](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/release?ref_type=heads) and download the VSIX (Visual Studio extension installer) file.
-2. Open Visual Studio Code.
-3. Click **Extensions**.
-4. Click **Views and more actions...**
-5. Select **Install from VSIX...**
+### Obtaining VSIX file
+In order to install the extension, you have to obtain VSIX (Visual Studio extension installer) file. You can either create it from source code yourself, or download it from [release folder](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/release?ref_type=heads), where the latest compiled version of this extension is stored.
+
+### Creating VSIX from source code
+If you have decided to download the VSIX file from the [release folder](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/release?ref_type=heads), skip this section.
+
+To build the souce code yourself, you need to have a [Node.js](https://nodejs.org/en) with `npm` (node package manager) installed on your machine. If you have `npm` ready, follow these steps:
+
+1. Download the source code from this repository.
+2. In the root folder run:
+  ```
+  npm install
+  ```
+
+ After you have successfully built the project, you will have to create VSIX file using `vsce` (Visual Studio Code extension) tool. Do the following:
+
+1. To install the `vsce` tool, run:
+  ```
+  npm install -g @vscode/vsce
+  ```
+2. In the root folder of the built extension, run:
+  ```
+  vsce package
+  ```
+
+Doing the steps above will provide you with `java-memory-analyzer.vsix`.
+
+### Installing the extension in Visual Studio Code
+If you have the VSIX file ready, you can install the extension inside Visual Studio Code:
+1. Open Visual Studio Code.
+2. Click **Extensions**.
+3. Click **Views and more actions...**
+4. Select **Install from VSIX...**
 
 <img src="https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/install.gif?ref_type=heads" width=50% height=50%>
 
 **Note:** 
-- After downloading the VSIX file, you can also install the extension from the terminal with the following command:
+- After obtainig the VSIX file, you can also install the extension from the terminal with the following command:
 
   ```
   code --install-extension path/to/extension.vsix
@@ -39,10 +69,15 @@ Before using this extension, ensure that [Language Support for Java(TM) by Red H
 4. To show currently selected line details, run **Memory Analyzer: Show line details**.
 5. Clicking on the link of the details table will move the cursor to the position of that particular allocation.
 
-**Tips:**
-- Commands can be found in context menu of using `ctrl + shift + P`.
-- This repository also contains [PluginDemo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/PluginDemo?ref_type=heads) with gerenated `data.json` that you can use for small demonstration.
-- You can create a run configuration similliar to `.vscode/launch.json` of [PluginDemo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/PluginDemo?ref_type=heads) to easily generate a JSON file within Visual Studio Code (this will require more extensions for full Visual Studio Code Java IDE).
+You can read more in the section **Commands**.
+
+## PluginDemo
+This repository also contains [PluginDemo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/PluginDemo?ref_type=heads), which is Java project that can be built with Maven using `mvn clean install`
+
+[PluginDemo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/PluginDemo?ref_type=heads) comes with gerenated `java-agent-with-dependencies.jar`, which is compiled [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser) and generated `data.json` that is ready to use for small demonstration of this extension.
+
+You can create a run configuration similliar to `.vscode/launch.json` of to easily generate a JSON file within Visual Studio Code (this will require more extensions for full Visual Studio Code Java IDE).
+
 
 ## Commands
 - `Memory Analyzer: Load JSON file`: load the generated JSON file
@@ -51,9 +86,12 @@ Before using this extension, ensure that [Language Support for Java(TM) by Red H
   * this option is also available under mouse right-click context menu
 
 **Tip:**
+- Commands can be found in context menu of using `ctrl + shift + P`.
 - It is recommended to map commands to key bindings for personal convenience, refer to the [official Visual Studio Code documentation](https://code.visualstudio.com/docs/getstarted/keybindings).
 
 ## Settings
+Settings in Visual Studio Code can be accessed with default shortcut `ctrl + ,`, after that search for `java-memory-analyzer`
+
 ### JSON load settings
 - `java-memory-analyzer.json.defaultPath`: absolute path where the JSON is located. If not empty, this path will be always have priority over the popup window
 - `java-memory-analyzer.json.askToSavePath`: turn off to stop asking if you want to set currently loaded path as default
