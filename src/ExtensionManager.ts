@@ -160,10 +160,12 @@ export class ExtensionManager {
             const dupeData: { name: string, size: number, count: number, source: string }[] = [];
 
             lineRecords.forEach(l => {
-                allocData.push({ name: l.name, size: l.size, count: l.count, source: l.getJavaSource() });
-                l.duplicates.forEach(t => {
-                    dupeData.push({ name: l.name, size: l.size, count: t.count, source: t.getJavaSource() });
-                });
+                if (l.size !== 0) {
+                    allocData.push({ name: l.name, size: l.size, count: l.count, source: l.getJavaSource() });
+                    l.duplicates.forEach(t => {
+                        dupeData.push({ name: l.name, size: l.size, count: t.count, source: t.getJavaSource() });
+                    });
+                }
             });
             dupeData.sort((a, b) => a.source.localeCompare(b.source));
 

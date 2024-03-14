@@ -10,13 +10,9 @@ vsc-extension-quickstart.md
 **/*.ts
 **/.vscode-test.*
 
-data/**
-PluginDemo/**
-icons/class_allocation.svg
-icons/icon.svg
-icons/line_allocation.svg
-icons/method_allocation.svg
-icons/no_allocation.svg
+demo/**
+icons/*.svg
+release/*
 
 # Exception
 !src/webview/main.css

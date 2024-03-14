@@ -1,0 +1,17 @@
+[
+    {
+        "LINE": [
+            {
+                "class": "main.Main",
+                "method": 45,
+                "line": 23,
+                "size": 24,
+                "count": 1,
+                "name": "BiggerTestingObject"
+            }
+        ]
+    },
+    {
+        "DUPLICATE": []
+    }
+]

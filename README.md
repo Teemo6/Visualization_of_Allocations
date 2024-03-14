@@ -57,7 +57,7 @@ If you have the VSIX file ready, you can install the extension inside Visual Stu
 <img src="https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/install.gif?ref_type=heads" width=50% height=50%>
 
 ## How to use 
-In order to visualize allocation data, you have to provide JSON file that can be generated with an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser). If you have the data ready, you can do following:
+In order to visualize allocation data, you have to provide JSON file that can be generated with an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser). If you have the data ready, you can do the following:
 
 1. Open your Java project in Visual Studio Code and wait for Java symbols to fully load (indicated by **Java: ready** in the bottom status bar).
 2. Run command **Memory Analyzer: Load JSON file**.
@@ -68,12 +68,18 @@ In order to visualize allocation data, you have to provide JSON file that can be
 - Commands can be found in the context menu with shortcut `ctrl + shift + P`.
 - To quickly navigate, search for `Memory Analyzer:`.
 
-## Demo
-This repository contains [PluginDemo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/PluginDemo?ref_type=heads), which includes generated `data.json` that is ready to use for live demonstration of this extension as seen above.
+## How to obtain JSON file
+This repository includes [demo applications](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/demo?ref_type=heads), each featuring pre-generated `data.json` that you can use for a quick demonstration of this extension.
 
-In order to run an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser) within Visual Studio Code, you can create a run configuration similliar to `.vscode/launch.json`. This action will require a compiled JAR file of the [memory analyzer](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser) and a JAR of the application you want to profile.
+In order to create `data.json` yourself, you will need to build the [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser) using [Maven](https://maven.apache.org/). Instructions are available in the project repository.
 
-[PluginDemo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/PluginDemo?ref_type=heads) is a Java project that can be built with [Maven](https://maven.apache.org/) using `mvn clean install`.
+To build the [demo applications](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/demo?ref_type=heads), you can call the following command from root folder of this repository, which will create a compiled JAR `<demoApp>/target/app.jar`:
+
+```
+mvn -f demo clean install
+```
+
+Each demo in this repository contains configuration `.vscode/launch.json` that can be used to easily run compiled memory analyzer application.
 
 ## Commands
 - `Memory Analyzer: Load JSON file`: load the generated JSON file
@@ -114,7 +120,7 @@ In order to run an [external Memory Analyzer application](https://gitlab.kiv.zcu
 ![Color change](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/color.gif?ref_type=heads)
 
 ## Known Issues and limitations
-- The format of JSON file is same as an output of an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser), no other JSON format is supported.
+- The format of JSON file is same as an output of the [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser), no other JSON format is supported.
 - The visualization can only show as much data as it is provided with the JSON file. 
 - Extension does not actually detect the keyword `new` on the line, it only highlights lines according to the provided file.
 - No support for visualization of nested classes, nested methods and enumerations.

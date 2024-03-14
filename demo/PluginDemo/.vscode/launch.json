@@ -7,10 +7,9 @@
             "request": "launch",
             "mainClass": "main.Main",
             "vmArgs": [
-                "--add-opens", "java.base/java.util=ALL-UNNAMED",
+                "--add-opens", "java.base/java.util=ALL-UNNAMED",   // Example --add-opens, not actually needed in the project
                 "--add-opens", "java.base/java.lang=ALL-UNNAMED",
                 "--add-opens", "java.base/java.io=ALL-UNNAMED",
-                "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
                 "-javaagent:agent-jar-with-dependencies.jar",       // JAR with memory analyzer
                 "-jar", "target/app.jar"                            // JAR of this project
             ],

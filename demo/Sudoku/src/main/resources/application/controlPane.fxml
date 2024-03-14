@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" minHeight="800.0" minWidth="300.0" prefHeight="800.0" prefWidth="300.0"
+      xmlns="http://javafx.com/javafx/11" fx:id="vbox" fx:controller="controller.ControlPaneController">
+
+    <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" fx:id="playPane" minHeight="0" minWidth="0">
+        <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+            <padding>
+                <Insets topRightBottomLeft="10"/>
+            </padding>
+
+            <Text fx:id="timerText" textAlignment="CENTER" HBox.hgrow="ALWAYS" text="05:27">
+                <font>
+                    <Font size="30.0"/>
+                </font>
+            </Text>
+        </HBox>
+
+        <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+            <maxHeight>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxHeight>
+
+            <maxWidth>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxWidth>
+
+            <padding>
+                <Insets topRightBottomLeft="10"/>
+            </padding>
+
+            <Button contentDisplay="CENTER" onAction="#checkAction" text="Check" HBox.hgrow="ALWAYS">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <font>
+                    <Font size="15.0"/>
+                </font>
+            </Button>
+        </HBox>
+
+        <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+            <maxHeight>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxHeight>
+
+            <maxWidth>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxWidth>
+
+            <padding>
+                <Insets topRightBottomLeft="10"/>
+            </padding>
+
+            <Button contentDisplay="CENTER" onAction="#solveAction" text="Solve" HBox.hgrow="ALWAYS">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <font>
+                    <Font size="15.0"/>
+                </font>
+            </Button>
+        </HBox>
+
+        <HBox alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
+            <maxHeight>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxHeight>
+
+            <maxWidth>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxWidth>
+
+            <padding>
+                <Insets topRightBottomLeft="10"/>
+            </padding>
+            <RadioButton fx:id="buttonSetNormal" contentDisplay="CENTER" prefHeight="60.0" prefWidth="130.0" selected="true"
+                         styleClass="button" text="Normal">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <toggleGroup>
+                    <ToggleGroup fx:id="mode"/>
+                </toggleGroup>
+            </RadioButton>
+
+            <RadioButton fx:id="buttonSetFlag" contentDisplay="CENTER" prefHeight="60.0" prefWidth="130.0"
+                         styleClass="button" text="Flag" toggleGroup="$mode">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+            </RadioButton>
+        </HBox>
+    </VBox>
+
+    <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" fx:id="createPane" minHeight="0" minWidth="0">
+        <maxHeight>
+            <Double fx:constant="MAX_VALUE"/>
+        </maxHeight>
+
+        <maxWidth>
+            <Double fx:constant="MAX_VALUE"/>
+        </maxWidth>
+
+        <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+            <maxHeight>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxHeight>
+
+            <maxWidth>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxWidth>
+
+            <padding>
+                <Insets topRightBottomLeft="10"/>
+            </padding>
+
+            <Button contentDisplay="CENTER" onAction="#createAction" text="Create" HBox.hgrow="ALWAYS">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <font>
+                    <Font size="15.0"/>
+                </font>
+            </Button>
+        </HBox>
+
+        <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+            <maxHeight>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxHeight>
+
+            <maxWidth>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxWidth>
+
+            <padding>
+                <Insets topRightBottomLeft="10"/>
+            </padding>
+
+            <Button contentDisplay="CENTER" onAction="#clearAction" text="Clear" HBox.hgrow="ALWAYS">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <font>
+                    <Font size="15.0"/>
+                </font>
+            </Button>
+        </HBox>
+
+    </VBox>
+
+    <VBox VBox.vgrow="ALWAYS">
+        <maxHeight>
+            <Double fx:constant="MAX_VALUE"/>
+        </maxHeight>
+
+        <maxWidth>
+            <Double fx:constant="MAX_VALUE"/>
+        </maxWidth>
+
+        <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0"/>
+        </padding>
+
+        <HBox spacing="10.0" VBox.vgrow="ALWAYS">
+            <maxHeight>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxHeight>
+
+            <maxWidth>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxWidth>
+
+            <padding>
+                <Insets topRightBottomLeft="10"/>
+            </padding>
+
+            <Button onAction="#putNumber" text="1" HBox.hgrow="ALWAYS">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <font>
+                    <Font size="20.0"/>
+                </font>
+            </Button>
+
+            <Button onAction="#putNumber" text="2" HBox.hgrow="ALWAYS">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <font>
+                    <Font size="20.0"/>
+                </font>
+            </Button>
+
+            <Button onAction="#putNumber" text="3" HBox.hgrow="ALWAYS">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <font>
+                    <Font size="20.0"/>
+                </font>
+            </Button>
+        </HBox>
+
+        <HBox spacing="10.0" VBox.vgrow="ALWAYS">
+            <maxHeight>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxHeight>
+
+            <maxWidth>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxWidth>
+
+            <padding>
+                <Insets topRightBottomLeft="10"/>
+            </padding>
+
+            <Button onAction="#putNumber" text="4" HBox.hgrow="ALWAYS">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <font>
+                    <Font size="20.0"/>
+                </font>
+            </Button>
+
+            <Button onAction="#putNumber" text="5" HBox.hgrow="ALWAYS">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <font>
+                    <Font size="20.0"/>
+                </font>
+            </Button>
+
+            <Button onAction="#putNumber" text="6" HBox.hgrow="ALWAYS">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <font>
+                    <Font size="20.0"/>
+                </font>
+            </Button>
+        </HBox>
+
+        <HBox spacing="10.0" VBox.vgrow="ALWAYS">
+            <maxHeight>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxHeight>
+
+            <maxWidth>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxWidth>
+
+            <padding>
+                <Insets topRightBottomLeft="10"/>
+            </padding>
+
+            <Button onAction="#putNumber" text="7" HBox.hgrow="ALWAYS">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <font>
+                    <Font size="20.0"/>
+                </font>
+            </Button>
+
+            <Button onAction="#putNumber" text="8" HBox.hgrow="ALWAYS">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <font>
+                    <Font size="20.0"/>
+                </font>
+            </Button>
+
+            <Button onAction="#putNumber" text="9" HBox.hgrow="ALWAYS">
+                <maxHeight>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxHeight>
+
+                <maxWidth>
+                    <Double fx:constant="MAX_VALUE"/>
+                </maxWidth>
+
+                <font>
+                    <Font size="20.0"/>
+                </font>
+            </Button>
+        </HBox>
+
+        <Button onAction="#deleteNumber" text="Delete" VBox.vgrow="ALWAYS">
+            <maxHeight>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxHeight>
+
+            <maxWidth>
+                <Double fx:constant="MAX_VALUE"/>
+            </maxWidth>
+
+            <font>
+                <Font size="15.0"/>
+            </font>
+
+            <VBox.margin>
+                <Insets left="50.0" right="50.0"/>
+            </VBox.margin>
+        </Button>
+    </VBox>
+</VBox>

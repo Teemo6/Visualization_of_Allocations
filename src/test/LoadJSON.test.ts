@@ -1,124 +1,37 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
+
 import path from 'path';
+import fs from 'fs';
 
 import * as json from '../load/AllocationJSON';
 
-// TODO: Update with new JSON files
-suite('Allocation JSON', () => {
-    test('Valid regular JSON', async () => {
-        let jsonData;
-        try {
-            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'valid_regular.json'));
-            const rawData = await vscode.workspace.fs.readFile(dataUri);
-            jsonData = JSON.parse(rawData.toString());
-        } catch (error) {
-            vscode.window.showErrorMessage("Invalid JSON file");
-            return;
-        }
+suite("AllocationJSON detection", () => {
+    const validPath = path.join(__dirname, "../", "../", "src", "test", "LoadJSON_data", "valid");
+    fs.readdirSync(validPath).forEach(file => {
+        if (file.endsWith(".json")) {
+            const filePath = path.join(validPath, file);
+            test("Valid test: " + file, async () => {
+                const dataUri = vscode.Uri.file(filePath);
+                const rawData = await vscode.workspace.fs.readFile(dataUri);
+                const jsonData = JSON.parse(rawData.toString());
 
-        assert.equal(true, json.createAllocationJSON(jsonData));
+                assert.equal(true, (json.createAllocationJSON(jsonData) !== undefined));
+            });
+        }
     });
 
-    test('Valid empty JSON', async () => {
-        let jsonData;
-        try {
-            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'valid_empty.json'));
-            const rawData = await vscode.workspace.fs.readFile(dataUri);
-            jsonData = JSON.parse(rawData.toString());
-        } catch (error) {
-            vscode.window.showErrorMessage("Invalid JSON file");
-            return;
+    const invalidPath = path.join(__dirname, "../", "../", "src", "test", "LoadJSON_data", "invalid");
+    fs.readdirSync(invalidPath).forEach(file => {
+        if (file.endsWith(".json")) {
+            const filePath = path.join(invalidPath, file);
+            test("Invalid test: " + file, async () => {
+                const dataUri = vscode.Uri.file(filePath);
+                const rawData = await vscode.workspace.fs.readFile(dataUri);
+                const jsonData = JSON.parse(rawData.toString());
+
+                assert.equal(false, (json.createAllocationJSON(jsonData) !== undefined));
+            });
         }
-
-        assert.equal(true, json.createAllocationJSON(jsonData));
-    });
-
-    test('Invalid key JSON', async () => {
-        let jsonData;
-        try {
-            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_key.json'));
-            const rawData = await vscode.workspace.fs.readFile(dataUri);
-            jsonData = JSON.parse(rawData.toString());
-        } catch (error) {
-            vscode.window.showErrorMessage("Invalid JSON file");
-            return;
-        }
-
-        assert.equal(false, json.createAllocationJSON(jsonData));
-    });
-
-    test('Invalid value JSON', async () => {
-        let jsonData;
-        try {
-            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_value.json'));
-            const rawData = await vscode.workspace.fs.readFile(dataUri);
-            jsonData = JSON.parse(rawData.toString());
-        } catch (error) {
-            vscode.window.showErrorMessage("Invalid JSON file");
-            return;
-        }
-
-        assert.equal(false, json.createAllocationJSON(jsonData));
-    });
-
-    test('Invalid missing line JSON', async () => {
-        let jsonData;
-        try {
-            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_missing_line.json'));
-            const rawData = await vscode.workspace.fs.readFile(dataUri);
-            jsonData = JSON.parse(rawData.toString());
-        } catch (error) {
-            vscode.window.showErrorMessage("Invalid JSON file");
-            return;
-        }
-
-        assert.equal(false, json.createAllocationJSON(jsonData));
-    });
-
-    test('Invalid missing method JSON', async () => {
-        let jsonData;
-        try {
-            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_missing_method.json'));
-            const rawData = await vscode.workspace.fs.readFile(dataUri);
-            jsonData = JSON.parse(rawData.toString());
-        } catch (error) {
-            vscode.window.showErrorMessage("Invalid JSON file");
-            return;
-        }
-
-        assert.equal(false, json.createAllocationJSON(jsonData));
-    });
-
-    test('Invalid missing class JSON', async () => {
-        let jsonData;
-        try {
-            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_missing_class.json'));
-            const rawData = await vscode.workspace.fs.readFile(dataUri);
-            jsonData = JSON.parse(rawData.toString());
-        } catch (error) {
-            vscode.window.showErrorMessage("Invalid JSON file");
-            return;
-        }
-
-        assert.equal(false, json.createAllocationJSON(jsonData));
-    });
-
-    test('Invalid missing duplicate JSON', async () => {
-        let jsonData;
-        try {
-            const dataUri = vscode.Uri.file(path.join(__dirname, 'data', 'invalid_missing_duplicate.json'));
-            const rawData = await vscode.workspace.fs.readFile(dataUri);
-            jsonData = JSON.parse(rawData.toString());
-        } catch (error) {
-            vscode.window.showErrorMessage("Invalid JSON file");
-            return;
-        }
-
-        assert.equal(false, json.createAllocationJSON(jsonData));
-    });
-
-    test('Invalid JSON', async () => {
-        assert.equal(false, false);
     });
 });

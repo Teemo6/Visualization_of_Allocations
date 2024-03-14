@@ -1,0 +1,61 @@
+.button {
+    -fx-background-color: #4C9AD8;
+    -fx-border-width: 0;
+    -fx-border-color: none;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 1.3em;
+}
+
+.button:hover {
+    -fx-background-color: #2980b9;
+}
+
+.button:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.button:pressed {
+    -fx-background-color: #4d9fd6;
+}
+
+.button:selected {
+	-fx-background-color: #2a78ad;
+}
+
+.tile-selected {
+	-fx-background-color: yellow;
+}
+
+.error{
+	-fx-background-color: red;
+}
+
+.tile-selected .error {
+	-fx-background-color: yellow;
+}
+
+.blackBorder {
+	-fx-border-color: black;
+}
+
+.tileBorderRightBottom {
+	-fx-border-width: 1 4 4 1;
+}
+
+.tileBorderRight {
+	-fx-border-width: 1 4 1 1;
+}
+
+.tileBorderBottom {
+	-fx-border-width: 1 1 4 1;
+}
+
+.tileBorder {
+	-fx-border-width: 1 1 1 1;
+}
+
+#recordTableView .table-column {
+    -fx-alignment: center;
+}

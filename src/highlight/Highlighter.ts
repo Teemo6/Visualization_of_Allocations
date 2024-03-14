@@ -75,7 +75,13 @@ export class Highlighter {
 
         // Add highlights according to the file map
         for (const editor of editors) {
-            const normalizedPath = path.normalize(editor.document.uri.path);
+            let normalizedPath = path.normalize(editor.document.uri.path);
+            // This block is here because for some reason editor.document.uri.path sometimes returns C: or c: on Windows
+            // Known URI bug https://github.com/microsoft/vscode/issues/138397
+            if (normalizedPath.indexOf(":") !== 0) {
+                normalizedPath = normalizedPath.substring(0, normalizedPath.indexOf(":")).toLowerCase()
+                    + normalizedPath.substring(normalizedPath.indexOf(":"), normalizedPath.length);
+            }
             if (this.highlightMap.has(normalizedPath)) {
                 this.highlightMap.get(normalizedPath)!.forEach(e => {
                     editor.setDecorations(e.decorator, e.line);
@@ -118,7 +124,13 @@ export class Highlighter {
 
         // Add highlights according to the file map
         for (const editor of editors) {
-            const normalizedPath = path.normalize(editor.document.uri.path);
+            let normalizedPath = path.normalize(editor.document.uri.path);
+            // This block is here because for some reason editor.document.uri.path sometimes returns C: or c: on Windows
+            // Known URI bug https://github.com/microsoft/vscode/issues/138397
+            if (normalizedPath.indexOf(":") !== 0) {
+                normalizedPath = normalizedPath.substring(0, normalizedPath.indexOf(":")).toLowerCase()
+                    + normalizedPath.substring(normalizedPath.indexOf(":"), normalizedPath.length);
+            }
             if (this.highlightMap.has(normalizedPath)) {
                 this.highlightMap.get(normalizedPath)!.forEach(e => {
                     editor.setDecorations(e.decorator, []);

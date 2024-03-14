@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run Analyzer",
+            "request": "launch",
+            "mainClass": "Main",
+            "vmArgs": [
+                "-javaagent:agent-jar-with-dependencies.jar",           // Memory Analyzer JAR
+                "-jar", "target/app.jar"                                // JAR of this application
+            ],
+            "args": [],
+            "projectName": "Demo",
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false
+        },
+    ]
+}

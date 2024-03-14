@@ -1,0 +1,226 @@
+[
+    {
+        "LINE": [
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 23,
+                "size": 24,
+                "count": 1,
+                "name": "BiggerTestingObject"
+            },
+            {
+                "class": "other.OtherPackageClass",
+                "method": "outsidePackageAloneTest",
+                "line": 15,
+                "size": 16,
+                "count": 100,
+                "name": "OtherTestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 27,
+                "size": 16,
+                "count": 1,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 30,
+                "size": 16,
+                "count": 2,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "main",
+                "line": 60,
+                "size": 16,
+                "count": 10,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 23,
+                "size": 16,
+                "count": 1,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 19,
+                "size": 16,
+                "count": 1,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.OtherClass",
+                "method": "samePackageDuplicateTest",
+                "line": 14,
+                "size": 16,
+                "count": 10,
+                "name": "TestingObject"
+            },
+            {
+                "class": "other.OtherPackageClass",
+                "method": "outsidePackageTest",
+                "line": 8,
+                "size": 16,
+                "count": 200,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "main",
+                "line": 88,
+                "size": 16,
+                "count": 100,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 41,
+                "size": 24,
+                "count": 1,
+                "name": "BiggerTestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 26,
+                "size": 16,
+                "count": 1,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 20,
+                "size": 24,
+                "count": 1,
+                "name": "BiggerTestingObject"
+            },
+            {
+                "class": "main.OtherClass",
+                "method": "samePackageTest",
+                "line": 7,
+                "size": 16,
+                "count": 10,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 33,
+                "size": 16,
+                "count": 2,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 38,
+                "size": 16,
+                "count": 2,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 42,
+                "size": 24,
+                "count": 1,
+                "name": "BiggerTestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 41,
+                "size": 16,
+                "count": 1,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 34,
+                "size": 16,
+                "count": 2,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "main",
+                "line": 55,
+                "size": 16,
+                "count": 10,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "main",
+                "line": 68,
+                "size": 16,
+                "count": 10,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 37,
+                "size": 16,
+                "count": 2,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "main",
+                "line": 48,
+                "size": 16,
+                "count": 1,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "basicAllocationTest",
+                "line": 42,
+                "size": 16,
+                "count": 1,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.OtherClass",
+                "method": "samePackageDuplicateTest",
+                "line": 17,
+                "size": 16,
+                "count": 10,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "main",
+                "line": 78,
+                "size": 16,
+                "count": 10,
+                "name": "TestingObject"
+            },
+            {
+                "class": "main.Main",
+                "method": "main",
+                "line": 65,
+                "size": 16,
+                "count": 10,
+                "name": "TestingObject"
+            }
+        ]
+    },
+    {
+        "DUPLICATE": [
+        ]
+    }
+]
