@@ -4,5 +4,6 @@
 export enum AllocationKind {
     CLASS = "class",
     METHOD = "method",  // also used for constructor
-    LINE = "line"
+    LINE = "line",
+    PARAMETER = "parameter"
 }

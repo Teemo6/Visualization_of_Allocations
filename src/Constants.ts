@@ -15,6 +15,10 @@ export class Constants {
      */
     public static CONFIG_DETAILS = "java-memory-analyzer.details";
     /**
+     * Highlight font style
+     */
+    public static CONFIG_FONT = "java-memory-analyzer.highlightFont";
+    /**
      * LSP extension provider
      */
     public static LSP_EXTENSION: string = "redhat.java";

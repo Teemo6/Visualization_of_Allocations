@@ -201,11 +201,11 @@ export class Loader {
         if (noSymbols.length !== 0) {
             let which: string = "";
             noSymbols.forEach(s => {
-                which += path.basename(s);
+                which += path.basename(s) + ", ";
             });
+            which = which.substring(0, which.length - 2);
             vscode.window.showWarningMessage("Found no Java symbols in files: " + which);
         }
-
         return true;
     }
 

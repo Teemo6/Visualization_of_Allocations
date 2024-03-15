@@ -119,11 +119,10 @@ export class ExtensionManager {
             if (r.line === activeLineNumber) {
                 activeLineKind = r.kind;
                 activeLineName = r.name;
-                if (activeLineKind === AllocationKind.LINE) {
+                if (activeLineKind === AllocationKind.LINE || activeLineKind === AllocationKind.PARAMETER) {
+                    activeLineKind = AllocationKind.LINE;
                     lineRecords.push(r);
                 } else if (r.size !== 0) {
-                    activeLineKind = r.kind;
-                    activeLineName = r.name;
                     if (r.range !== undefined) {
                         start = r.range.start.line + 1;
                         end = r.range.end.line + 1;
@@ -136,8 +135,8 @@ export class ExtensionManager {
         // Get child data of class / method
         if (start !== Number.MAX_SAFE_INTEGER && end !== Number.MIN_SAFE_INTEGER) {
             for (const r of records!) {
-                if (start < r.line && r.line < end) {
-                    if (activeLineKind === AllocationKind.CLASS && r.kind === AllocationKind.METHOD) {
+                if (start <= r.line && r.line < end) {
+                    if (activeLineKind === AllocationKind.CLASS && (r.kind === AllocationKind.METHOD || r.kind === AllocationKind.PARAMETER)) {
                         lineRecords.push(r);
                     }
                     if (activeLineKind === AllocationKind.METHOD && r.kind === AllocationKind.LINE) {
@@ -272,22 +271,32 @@ export class ExtensionManager {
                     classRecord!.allocated += totalSize;
 
                     // Find which constructor/method does the line fit in, ranges are sorted
-                    if (l.method === Constants.LINE_CONSTRUCTOR_STRING) {
-                        for (const con of classRecord!.constructors) {
-                            if (con.range.contains(lineRange)) {
-                                con.allocated += totalSize;
-                                break;
-                            }
+                    let foundMethod = false;
+                    for (const con of classRecord!.constructors) {
+                        if (con.range.contains(lineRange)) {
+                            con.allocated += totalSize;
+                            foundMethod = true;
+                            break;
                         }
-                    } else {
+                    }
+
+                    if (!foundMethod) {
                         for (const m of classRecord!.methods) {
                             if (m.range.contains(lineRange) && m.name.substring(0, m.name.indexOf("(")) === l.method) {
                                 m.allocated += totalSize;
+                                foundMethod = true;
                                 break;
                             }
                         }
                     }
-                    const lineRecord: AllocationRecord = new AllocationRecord(l.name, l.class, editorLine, AllocationKind.LINE);
+
+                    let allocationKind = AllocationKind.LINE;
+                    if (!foundMethod) {
+                        allocationKind = AllocationKind.PARAMETER;
+                    }
+
+                    // Add record to file
+                    const lineRecord: AllocationRecord = new AllocationRecord(l.name, l.class, editorLine, allocationKind);
                     lineRecord.size = l.size;
                     lineRecord.count = l.count;
                     if (this.allocationFileMap.has(classRecord!.file)) {
@@ -330,7 +339,7 @@ export class ExtensionManager {
             // Add trace info to allocation record
             for (const trace of allTraces) {
                 for (const alloc of this.allocationFileMap.get(trace.file)!) {
-                    if (alloc.kind === AllocationKind.LINE && alloc.line === trace.line - 1 && alloc.name === d.name && alloc.size === d.size) {
+                    if ((alloc.kind === AllocationKind.LINE || alloc.kind === AllocationKind.PARAMETER) && alloc.line === trace.line - 1 && alloc.name === d.name && alloc.size === d.size) {
                         alloc.dupeCount += d.duplicates;
                         alloc.duplicates.push(...allTraces);
                     }

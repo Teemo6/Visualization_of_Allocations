@@ -63,6 +63,16 @@
           "default": true,
           "description": "Clicking link in details table will automatically show new details about referenced line"
         },
+        "java-memory-analyzer.highlightFont.bold": {
+          "type": "boolean",
+          "default": false,
+          "description": "Highlight font will be bold"
+        },
+        "java-memory-analyzer.highlightFont.italic": {
+          "type": "boolean",
+          "default": false,
+          "description": "Highlight font will be italic"
+        },
         "java-memory-analyzer.color.lineBackground": {
           "type": "string",
           "default": "rgba(200, 150, 0, 0.2)",

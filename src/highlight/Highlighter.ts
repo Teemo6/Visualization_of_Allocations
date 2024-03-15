@@ -161,7 +161,7 @@ export class Highlighter {
             bgColor = vscode.workspace.getConfiguration(Constants.CONFIG_COLOR).get<string>("emptyBackground");
             textColor = vscode.workspace.getConfiguration(Constants.CONFIG_COLOR).get<string>("emptyText");
             // gutterPath = Constants.NO_ALLOCATION_GUTTER;
-        } else if (kind === AllocationKind.LINE) {
+        } else if (kind === AllocationKind.LINE || kind === AllocationKind.PARAMETER) {
             bgColor = vscode.workspace.getConfiguration(Constants.CONFIG_COLOR).get<string>("lineBackground");
             textColor = vscode.workspace.getConfiguration(Constants.CONFIG_COLOR).get<string>("lineText");
             // gutterPath = Constants.LINE_ALLOCATION_GUTTER;
@@ -183,6 +183,9 @@ export class Highlighter {
             text += ", found " + duplicates + " duplicates";
         }
 
+        const weight = vscode.workspace.getConfiguration(Constants.CONFIG_FONT).get<boolean>("bold") ? "bold" : "normal";
+        const style = vscode.workspace.getConfiguration(Constants.CONFIG_FONT).get<boolean>("italic") ? "italic" : "normal";
+
         return vscode.window.createTextEditorDecorationType({
             isWholeLine: true,
             backgroundColor: bgColor,
@@ -192,7 +195,9 @@ export class Highlighter {
             // gutterIconSize: "contain",
             after: {
                 contentText: text,
-                color: textColor
+                color: textColor,
+                fontWeight: weight,
+                fontStyle: style
             }
         });
     }

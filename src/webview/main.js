@@ -62,9 +62,9 @@ window.addEventListener("message", e => {
     if (message.type === "data") {
         let header = "<h2>Data for ";
         if (message.kind === "class") {
-            header += "class " + message.name + " at line " + message.line;
+            header += "class <i>" + message.name + "</i> at line " + message.line;
         } else if (message.kind === "method") {
-            header += "method " + message.name + " at line " + message.line;
+            header += "method <i>" + message.name + "</i> at line " + message.line;
         } else if (message.kind === "line") {
             header += "line " + message.line;
         }

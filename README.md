@@ -21,7 +21,7 @@ Before using, ensure that [Language Support for Java(TM) by Red Hat](https://mar
 
 ## How to install
 ### Obtaining VSIX file
-In order to install the extension, you have to acquire VSIX (Visual Studio extension installer) file. You can either create it from source code yourself, or download it from [release folder](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/release?ref_type=heads), where the latest compiled version of this extension is stored.
+In order to install the extension, you have to acquire VSIX (Visual Studio extension installer) file. You can either create it from source code yourself, or download it from [release folder](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/release?ref_type=heads), where is the latest build.
 
 ### Creating VSIX from the source code
 If you have decided to download the VSIX file from the [release folder](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/release?ref_type=heads), **skip this section**.
@@ -29,7 +29,7 @@ If you have decided to download the VSIX file from the [release folder](https://
 To build the souce code yourself, you will need a [Node.js](https://nodejs.org/en) with `npm` (node package manager) installed on your machine. If you have `npm` ready, follow these steps:
 
 1. Download the source code from this repository.
-2. In the root folder run:
+2. Build the extension:
   ```
   npm install
   ```
@@ -64,16 +64,18 @@ In order to visualize allocation data, you have to provide JSON file that can be
 3. To show more details, run **Memory Analyzer: Show line details** with a line selected.
 4. Clicking on the link of the details table will move the cursor to the position of that particular allocation.
 
+If you get prompted with a warning **Found no Java symbols in files**, Java language support could not find any class, method or constructor in the file, therefore no allocation data will be shown for these files. If the file contains some of these symbols, be sure that you run **Memory Analyzer: Load JSON file** with the language support fully loaded (indicated by **Java: ready**).
+
 **Tip:**
 - Commands can be found in the context menu with shortcut `ctrl + shift + P`.
-- To quickly navigate, search for `Memory Analyzer:`.
+- To quickly navigate, search for **Memory Analyzer**.
 
 ## How to obtain JSON file
 This repository includes [demo applications](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/demo?ref_type=heads), each featuring pre-generated `data.json` that you can use for a quick demonstration of this extension.
 
 In order to create `data.json` yourself, you will need to build the [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser) using [Maven](https://maven.apache.org/). Instructions are available in the project repository.
 
-To build the [demo applications](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/demo?ref_type=heads), you can call the following command from root folder of this repository, which will create a compiled JAR `<demoApp>/target/app.jar`:
+To build the [demo applications](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/demo?ref_type=heads), you can call the following command from root folder of this repository, which will create a JAR file `<demoApp>/target/app.jar` for each demo respectively:
 
 ```
 mvn -f demo clean install
@@ -119,9 +121,13 @@ Each demo in this repository contains configuration `.vscode/launch.json` that c
 
 ![Color change](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/color.gif?ref_type=heads)
 
+### Highlight font settings
+- `java-memory-analyzer.highlightFont.bold`: turn on to have bold highlight font
+- `java-memory-analyzer.highlightFont.itelic`: turn on to have italic highlight font
+
 ## Known Issues and limitations
 - The format of JSON file is same as an output of the [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser), no other JSON format is supported.
 - The visualization can only show as much data as it is provided with the JSON file. 
 - Extension does not actually detect the keyword `new` on the line, it only highlights lines according to the provided file.
 - No support for visualization of nested classes, nested methods and enumerations.
-- If you try to run **Load JSON file** without the Java language support fully loaded (**Java: ready** indication), some files may be missing allocation data. If this problem persists, the best solution is to restart the Visual Studio Code.
+- If you try to run **Load JSON file** without the Java language support fully loaded (indicated by **Java: ready**), some files may be missing allocation data. If this problem persists, the best solution is to restart the Visual Studio Code.
