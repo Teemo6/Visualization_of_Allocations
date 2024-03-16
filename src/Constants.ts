@@ -1,3 +1,5 @@
+import * as path from "path";
+
 /**
  * Constants used all around the extension
  */
@@ -40,4 +42,18 @@ export class Constants {
     // public static METHOD_ALLOCATION_GUTTER: vscode.Uri = vscode.Uri.file(path.join(__dirname, "icons", "method_allocation.svg"));
     // public static CLASS_ALLOCATION_GUTTER: vscode.Uri = vscode.Uri.file(path.join(__dirname, 'icons', 'class_allocation.svg'));
     // public static NO_ALLOCATION_GUTTER: vscode.Uri = vscode.Uri.file(path.join(__dirname, "icons", "no_allocation.svg"));
+
+    /**
+     * For some reason editor.document.uri.path sometimes returns C: or c: on Windows, it is a known URI bug https://github.com/microsoft/vscode/issues/138397
+     * @param p file path
+     * @returns normalized windows file path with small disc letter
+     */
+    public static normalizeWindowsPath(p: string): string {
+        let normalizedPath = path.normalize(p);
+        if (normalizedPath.indexOf(":") !== 0) {
+            normalizedPath = normalizedPath.substring(0, normalizedPath.indexOf(":")).toLowerCase()
+                + normalizedPath.substring(normalizedPath.indexOf(":"), normalizedPath.length);
+        }
+        return normalizedPath;
+    }
 }

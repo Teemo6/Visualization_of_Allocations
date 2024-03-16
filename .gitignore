@@ -3,6 +3,7 @@
 out
 .vscode-test.mjs
 
+**/verbose.log
 **/target/*
 **/.vscode/*
 !**/.vscode/launch.json

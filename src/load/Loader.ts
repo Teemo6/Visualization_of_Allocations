@@ -168,9 +168,9 @@ export class Loader {
 
             fileClasses.forEach(c => {
                 if (!filePackage) {
-                    this.classFileMap.set(c.name, new ClassRecord(path.normalize(file.path), filePackage, c.name, c.range, c.declared, c.methods, c.constructors));
+                    this.classFileMap.set(c.name, new ClassRecord(Constants.normalizeWindowsPath(file.path), filePackage, c.name, c.range, c.declared, c.methods, c.constructors));
                 } else {
-                    this.classFileMap.set(filePackage + "." + c.name, new ClassRecord(path.normalize(file.path), filePackage, c.name, c.range, c.declared, c.methods, c.constructors));
+                    this.classFileMap.set(filePackage + "." + c.name, new ClassRecord(Constants.normalizeWindowsPath(file.path), filePackage, c.name, c.range, c.declared, c.methods, c.constructors));
                 }
             });
         }
@@ -186,7 +186,7 @@ export class Loader {
         files.forEach(f => {
             let found = false;
             for (const val of this.classFileMap.values()) {
-                if (path.normalize(f.path) === val.file) {
+                if (Constants.normalizeWindowsPath(f.path) === val.file) {
                     found = true;
                     break;
                 }

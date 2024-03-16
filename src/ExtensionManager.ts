@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { Loader } from './load/Loader';
 import { Highlighter } from './highlight/Highlighter';
@@ -103,7 +102,8 @@ export class ExtensionManager {
 
         // Select active line
         const activeLineNumber = editor!.selection.active.line;
-        const records = this.allocationFileMap.get(path.normalize(editor!.document.uri.path));
+        const p = Constants.normalizeWindowsPath(editor!.document.uri.path);
+        const records = this.allocationFileMap.get(p);
         if (!records) {
             vscode.window.showErrorMessage("Cannot find any data for the selected file");
             return;

@@ -5,18 +5,14 @@
             "type": "java",
             "name": "Run Analyzer",
             "request": "launch",
-            "mainClass": "main.Main",
             "vmArgs": [
-                "--add-opens", "java.base/java.util=ALL-UNNAMED",   // Example --add-opens, not actually needed in the project
-                "--add-opens", "java.base/java.lang=ALL-UNNAMED",
-                "--add-opens", "java.base/java.io=ALL-UNNAMED",
-                "-javaagent:agent-jar-with-dependencies.jar",       // JAR with memory analyzer
-                "-jar", "target/app.jar"                            // JAR of this project
+                "-javaagent:agent-jar-with-dependencies.jar",       // Path to external memory analyzer JAR
+                "-jar", "target/app.jar"                            // Path to JAR of this application
             ],
             "args": [],
-            "projectName": "PluginDemo",
+            "projectName": "Demo",
             "cwd": "${workspaceFolder}",
             "stopOnEntry": false
-        },
+        }
     ]
 }

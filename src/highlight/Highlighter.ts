@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { HighlightData } from './HighlightData';
 import { Constants } from '../Constants';
@@ -75,13 +74,7 @@ export class Highlighter {
 
         // Add highlights according to the file map
         for (const editor of editors) {
-            let normalizedPath = path.normalize(editor.document.uri.path);
-            // This block is here because for some reason editor.document.uri.path sometimes returns C: or c: on Windows
-            // Known URI bug https://github.com/microsoft/vscode/issues/138397
-            if (normalizedPath.indexOf(":") !== 0) {
-                normalizedPath = normalizedPath.substring(0, normalizedPath.indexOf(":")).toLowerCase()
-                    + normalizedPath.substring(normalizedPath.indexOf(":"), normalizedPath.length);
-            }
+            const normalizedPath = Constants.normalizeWindowsPath(editor.document.uri.path);
             if (this.highlightMap.has(normalizedPath)) {
                 this.highlightMap.get(normalizedPath)!.forEach(e => {
                     editor.setDecorations(e.decorator, e.line);
@@ -124,13 +117,7 @@ export class Highlighter {
 
         // Add highlights according to the file map
         for (const editor of editors) {
-            let normalizedPath = path.normalize(editor.document.uri.path);
-            // This block is here because for some reason editor.document.uri.path sometimes returns C: or c: on Windows
-            // Known URI bug https://github.com/microsoft/vscode/issues/138397
-            if (normalizedPath.indexOf(":") !== 0) {
-                normalizedPath = normalizedPath.substring(0, normalizedPath.indexOf(":")).toLowerCase()
-                    + normalizedPath.substring(normalizedPath.indexOf(":"), normalizedPath.length);
-            }
+            const normalizedPath = Constants.normalizeWindowsPath(editor.document.uri.path);
             if (this.highlightMap.has(normalizedPath)) {
                 this.highlightMap.get(normalizedPath)!.forEach(e => {
                     editor.setDecorations(e.decorator, []);

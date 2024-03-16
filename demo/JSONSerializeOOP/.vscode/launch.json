@@ -5,15 +5,14 @@
             "type": "java",
             "name": "Run Analyzer",
             "request": "launch",
-            "mainClass": "Main",
             "vmArgs": [
-                "-javaagent:agent-jar-with-dependencies.jar",           // Memory Analyzer JAR
-                "-jar", "target/app.jar"                                // JAR of this application
+                "-javaagent:agent-jar-with-dependencies.jar",       // Path to external memory analyzer JAR
+                "-jar", "target/app.jar"                            // Path to JAR of this application
             ],
             "args": [],
             "projectName": "Demo",
             "cwd": "${workspaceFolder}",
             "stopOnEntry": false
-        },
+        }
     ]
 }
