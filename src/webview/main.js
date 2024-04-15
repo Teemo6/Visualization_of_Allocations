@@ -22,10 +22,21 @@ function fillDivWithTable(tableID, tableName, values, sourceID) {
 
     let id = 0;
     let idMap = new Map();
+
+    wasFirstSeparate = false;
     values.forEach(val => {
+        separate = "";
+        if (val.separate !== undefined){
+            if (val.separate && wasFirstSeparate){
+                separate = "separator_row";
+            } else {
+                wasFirstSeparate = true;
+            }
+        }
         idMap.set(sourceID + id.toString(), val.source);
+
         tableHTML += `
-                <tr>
+                <tr class=${separate}>
                     <td>${val.name}</td>
                     <td>${val.size}</td>
                     <td>${val.count}</td>

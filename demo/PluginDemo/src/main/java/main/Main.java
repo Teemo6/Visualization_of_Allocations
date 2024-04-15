@@ -87,5 +87,8 @@ public class Main {
         for (int i = 0; i < 100; i++){
             new TestingObject(13);
         }
+
+        Testing.usedMethod();
+        Testing.emptyMethod();
     }
 }

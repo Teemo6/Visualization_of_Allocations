@@ -60,7 +60,7 @@
         },
         "java-memory-analyzer.details.goToLineImmediately": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Clicking link in details table will automatically show new details about referenced line"
         },
         "java-memory-analyzer.highlightFont.bold": {

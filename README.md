@@ -44,6 +44,10 @@ To build the souce code yourself, you will need a [Node.js](https://nodejs.org/e
   ```
   vsce package
   ```
+2. Alternatively you can run a prepared script, which will create the VSIX file in the `release` folder:
+  ```
+  npm run pack-vsix
+  ```
 
 Doing the steps above will provide you with `java-memory-analyzer.vsix`.
 
@@ -66,7 +70,7 @@ In order to visualize allocation data, you have to provide JSON file that can be
 
 If you get prompted with a warning **Found no Java symbols in files**, Java language support could not find any class, method or constructor in the file, therefore no allocation data will be shown for these files. If the file contains some of these symbols, be sure that you run **Memory Analyzer: Load JSON file** with the language support fully loaded (indicated by **Java: ready**).
 
-**Tip:**
+**Tips:**
 - Commands can be found in the context menu with shortcut `ctrl + shift + P`.
 - To quickly navigate, search for **Memory Analyzer**.
 
@@ -103,7 +107,7 @@ Each demo in this repository contains configuration `.vscode/launch.json` that c
 - If you leave **Default path** empty and set **Ask to save path** to false, the analyzer will always ask for the location of the JSON file.
 
 ### Line details settings
-- `java-memory-analyzer.details.goToLineImmediately`: turn off to stop showing a newly selected line details when the reference link is clicked
+- `java-memory-analyzer.details.goToLineImmediately`: turn on to show a newly selected line details when the reference link is clicked
 
 ### Color settings
 - `java-memory-analyzer.color.lineBackground`: background color of line allocation
@@ -115,7 +119,7 @@ Each demo in this repository contains configuration `.vscode/launch.json` that c
 - `java-memory-analyzer.color.emptyBackground`: background color of no allocation (only for method/class)
 - `java-memory-analyzer.color.emptyText`: text color of no allocation (only for method/class)
 
-**Tip:** 
+**Tips:** 
 - All colors accept a string in the [CSS color format](https://www.w3schools.com/css/css_colors.asp).
 - If you have the visualization toggled on, the changes can be seen immediately.
 
@@ -128,6 +132,6 @@ Each demo in this repository contains configuration `.vscode/launch.json` that c
 ## Known Issues and limitations
 - The format of JSON file is same as an output of the [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser), no other JSON format is supported.
 - The visualization can only show as much data as it is provided with the JSON file. 
-- Extension does not actually detect the keyword `new` on the line, it only highlights lines according to the provided file.
+- Extension does not actually detect the keyword responsible for memory allocation (such as `new`), it only highlights lines according to the provided file.
 - No support for visualization of nested classes, nested methods and enumerations.
 - If you try to run **Load JSON file** without the Java language support fully loaded (indicated by **Java: ready**), some files may be missing allocation data. If this problem persists, the best solution is to restart the Visual Studio Code.

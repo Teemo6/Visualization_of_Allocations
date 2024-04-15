@@ -156,18 +156,25 @@ export class ExtensionManager {
             this.webviewTable.sendNothingToTable(activeLineNumber + 1);
         } else {
             const allocData: { name: string, size: number, count: number, source: string }[] = [];
-            const dupeData: { name: string, size: number, count: number, source: string }[] = [];
+            const dupeData: { name: string, size: number, count: number, source: string, separate: boolean}[] = [];
+
+            // Prevents multiple traces to same line
+            const traces: number[] = [];
 
             lineRecords.forEach(l => {
                 if (l.size !== 0) {
                     allocData.push({ name: l.name, size: l.size, count: l.count, source: l.getJavaSource() });
+                    let separate = true;
                     l.duplicates.forEach(t => {
-                        dupeData.push({ name: l.name, size: l.size, count: t.count, source: t.getJavaSource() });
+                        if (traces.includes(t.id)) {
+                            return;
+                        }
+                        traces.push(t.id);
+                        dupeData.push({ name: l.name, size: l.size, count: t.count, source: t.getJavaSource(), separate: separate });
+                        separate = false;
                     });
                 }
             });
-            dupeData.sort((a, b) => a.source.localeCompare(b.source));
-
             this.webviewTable.sendDataToTable(activeLineNumber + 1, activeLineKind, activeLineName, allocData, dupeData);
         }
     }
@@ -314,6 +321,7 @@ export class ExtensionManager {
         }
 
         // Load instance duplicate data
+        let trace_id = 1;
         for (const d of this.loadedJSON.DUPLICATE) {
             // Load every trace of duplicate
             const allTraces: DuplicateTrace[] = [];
@@ -329,7 +337,8 @@ export class ExtensionManager {
                 // Map trace to Java file
                 if (this.classFileMap.has(rawTrace.class)) {
                     const tracePath = this.classFileMap.get(rawTrace.class)!.file;
-                    allTraces.push(new DuplicateTrace(tracePath, rawTrace.class, rawTrace.method, rawTrace.line, rawTrace.count));
+                    allTraces.push(new DuplicateTrace(trace_id, tracePath, rawTrace.class, rawTrace.method, rawTrace.line, rawTrace.count));
+                    trace_id++;
                 } else {
                     console.error("Could not resolve class " + rawTrace.class + " of duplicate trace " + rawTrace.class + ":" + rawTrace.method + ":" + rawTrace.line);
                     continue;

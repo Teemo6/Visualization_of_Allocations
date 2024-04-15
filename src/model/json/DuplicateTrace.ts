@@ -5,6 +5,10 @@ import { Constants } from "../../Constants";
  */
 export class DuplicateTrace {
     /**
+     * Unique number representing duplicate trace
+     */
+    public id: number;
+    /**
      * Absolute string file path in current workspace, normalized with path.normalize()
      */
     public file: string;
@@ -33,7 +37,8 @@ export class DuplicateTrace {
      * @param line Line number indexed from 1
      * @param count How many duplicates have been created at this line
      */
-    constructor(file: string, clazz: string, method: string, line: number, count: number) {
+    constructor(id: number, file: string, clazz: string, method: string, line: number, count: number) {
+        this.id = id;
         this.file = file;
         this.class = clazz;
         this.method = method;
