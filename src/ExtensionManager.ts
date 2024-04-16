@@ -87,16 +87,20 @@ export class ExtensionManager {
     /**
      * Show webview panel with line allocation / duplicate details
      */
-    public async showDetail(): Promise<void> {
+    public async showDetail(silent: boolean): Promise<void> {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
-            vscode.window.showErrorMessage("No active editor");
+            if (!silent){
+                vscode.window.showErrorMessage("No active editor");
+            }
             return;
         }
 
         // Check activated highlighter
         if (!this.highlighter.isShowingData()) {
-            vscode.window.showErrorMessage("Load JSON and toggle the visualization on first");
+            if (!silent){
+                vscode.window.showErrorMessage("Load JSON and toggle the visualization on first");
+            }
             return;
         }
 
@@ -105,7 +109,9 @@ export class ExtensionManager {
         const p = Constants.normalizeWindowsPath(editor!.document.uri.path);
         const records = this.allocationFileMap.get(p);
         if (!records) {
-            vscode.window.showErrorMessage("Cannot find any data for the selected file");
+            if (!silent){
+                vscode.window.showErrorMessage("Cannot find any data for the selected file");
+            }
             return;
         }
 
@@ -180,6 +186,24 @@ export class ExtensionManager {
     }
 
     /**
+     * Show details called by event
+     */
+    public showDetailCursorEvent(): void{
+        // Check user config
+        if (!vscode.workspace.getConfiguration(Constants.CONFIG_DETAILS).get<boolean>("showDetailsAfterLineIsSelected")){
+            return;
+        }
+
+        // Check if details panel is open
+        if (!this.webviewTable.hasActivePanel()) {
+            return;
+        }
+
+        // Call silent show detail
+        this.showDetail(true);
+    }
+
+    /**
      * Toggle between showing and not showing data
      */
     public toggleShowingData(): void {
@@ -231,7 +255,7 @@ export class ExtensionManager {
 
             // Show line details immediately
             if (vscode.workspace.getConfiguration(Constants.CONFIG_DETAILS).get<string>("goToLineImmediately")) {
-                this.showDetail();
+                this.showDetail(false);
             }
         } else {
             console.error("Cannot find file " + parts[0]);

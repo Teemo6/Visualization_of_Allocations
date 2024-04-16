@@ -108,6 +108,7 @@ Each demo in this repository contains configuration `.vscode/launch.json` that c
 
 ### Line details settings
 - `java-memory-analyzer.details.goToLineImmediately`: turn on to show a newly selected line details when the reference link is clicked
+- `java-memory-analyzer.details.showDetailsAfterLineIsSelected`: after a line is selected and both visualisation and table panel are toggled on, the tables will show details of the selected line
 
 ### Color settings
 - `java-memory-analyzer.color.lineBackground`: background color of line allocation

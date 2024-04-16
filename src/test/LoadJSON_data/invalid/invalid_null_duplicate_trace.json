@@ -2,14 +2,6 @@
     {
         "LINE": [
             {
-                "class": "main.Main",
-                "method": "basicAllocationTest",
-                "line": 23,
-                "size": 24,
-                "count": 1,
-                "name": "BiggerTestingObject"
-            },
-            {
                 "class": "other.OtherPackageClass",
                 "method": "outsidePackageAloneTest",
                 "line": 15,
@@ -21,6 +13,14 @@
     },
     {
         "DUPLICATE": [
+            {
+                "name": "OtherTestingObject",
+                "size": 16,
+                "duplicates": 100,
+                "traces": [
+                    null
+                ]
+            }
         ]
     }
 ]

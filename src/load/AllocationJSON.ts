@@ -101,7 +101,14 @@ export interface DuplicateTraceJSON {
  * @param input object to compaer
  * @returns new object with parsed data from input, undefined if invalid format
  */
-export function createAllocationJSON(input: unknown): AllocationJSON | undefined {
+export function createAllocationJSON(rawData: string): AllocationJSON | undefined {
+    let input: object;
+    try{
+        input = JSON.parse(rawData);
+    } catch(err){
+        return undefined;
+    }
+
     if (!isSomeObject(input)) {
         return undefined;
     }

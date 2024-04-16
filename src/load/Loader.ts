@@ -26,6 +26,7 @@ export class Loader {
         // Reset local data
         this.loadedJSON = undefined;
         let jsonPath: vscode.Uri = vscode.Uri.file("");
+        let rawData: string;
 
         try {
             // Load file according to settings or open file dialog 
@@ -45,15 +46,14 @@ export class Loader {
                     }
                 });
             }
-            const rawData = await vscode.workspace.fs.readFile(jsonPath);
-            this.loadedJSON = await JSON.parse(rawData.toString());
+            rawData = (await vscode.workspace.fs.readFile(jsonPath)).toString();
         } catch (error) {
             vscode.window.showErrorMessage("Memory Analyzer: Could not read JSON data");
             return false;
         }
 
         // Check if loaded data have specified format
-        this.loadedJSON = createAllocationJSON(this.loadedJSON);
+        this.loadedJSON = createAllocationJSON(rawData);
         if (!this.loadedJSON) {
             vscode.window.showErrorMessage("JSON file has unexpected format");
             return false;

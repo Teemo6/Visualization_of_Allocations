@@ -15,7 +15,7 @@ export function activate(context: vscode.ExtensionContext): void {
     const loadFile = vscode.commands.registerCommand('java-memory-analyzer.loadFile', manager.loadFile.bind(manager));
 
     // Only load JSON file
-    const showDetail = vscode.commands.registerCommand('java-memory-analyzer.showDetail', manager.showDetail.bind(manager));
+    const showDetail = vscode.commands.registerCommand('java-memory-analyzer.showDetail', manager.showDetail.bind(manager, false));
 
     // Start / stop showing allocation data
     const toggleShowing = vscode.commands.registerCommand('java-memory-analyzer.toggleShowing', manager.toggleShowingData.bind(manager));
@@ -27,6 +27,9 @@ export function activate(context: vscode.ExtensionContext): void {
     // Reload highlight on configuration change
     const relaodHighlights = vscode.workspace.onDidChangeConfiguration(manager.reloadHighlights.bind(manager));
 
+    // Show tables with details on cursor change
+    const showDetailCursorEvent = vscode.window.onDidChangeTextEditorSelection(manager.showDetailCursorEvent.bind(manager));
+
     // Command actions
     context.subscriptions.push(loadFile);
     context.subscriptions.push(showDetail);
@@ -35,4 +38,5 @@ export function activate(context: vscode.ExtensionContext): void {
     // Event actions
     context.subscriptions.push(highlightLines);
     context.subscriptions.push(relaodHighlights);
+    context.subscriptions.push(showDetailCursorEvent);
 }

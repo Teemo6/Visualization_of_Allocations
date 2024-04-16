@@ -1,0 +1,31 @@
+[
+    {
+        "LINE": [
+            {
+                "class": "other.OtherPackageClass",
+                "method": "outsidePackageAloneTest",
+                "line": 15,
+                "size": 16,
+                "count": 100,
+                "name": "OtherTestingObject"
+            }
+        ]
+    },
+    {
+        "DUPLICATE": [
+            {
+                "name": "OtherTestingObject",
+                "size": 16,
+                "duplicates": 100,
+                "traces": [
+                    {
+                        "class": "other.OtherPackageClass",
+                        "method": "outsidePackageAloneTest",
+                        "line": -15,
+                        "count": 100
+                    }
+                ]
+            }
+        ]
+    }
+]

@@ -63,6 +63,11 @@
           "default": false,
           "description": "Clicking link in details table will automatically show new details about referenced line"
         },
+        "java-memory-analyzer.details.showDetailsAfterLineIsSelected": {
+          "type": "boolean",
+          "default": true,
+          "description": "Clicking any line will show details if visualisation and table panel is toggled on"
+        },
         "java-memory-analyzer.highlightFont.bold": {
           "type": "boolean",
           "default": false,
@@ -124,17 +129,19 @@
     "lint": "eslint src --ext ts",
     "lint-fix": "eslint . --ext .ts --fix",
     "test": "vscode-test",
+    "test-coverage": "c8 --check-coverage vscode-test",
     "pack-vsix": "vsce package --out release/java-memory-analyzer.vsix"
   },
   "devDependencies": {
-    "@types/vscode": "^1.86.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
+    "@types/vscode": "^1.86.0",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
-    "eslint": "^8.56.0",
-    "typescript": "^5.3.3",
     "@vscode/test-cli": "^0.0.4",
-    "@vscode/test-electron": "^2.3.9"
+    "@vscode/test-electron": "^2.3.9",
+    "c8": "^9.1.0",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
   }
 }

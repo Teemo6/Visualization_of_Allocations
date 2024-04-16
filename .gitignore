@@ -9,3 +9,4 @@ out
 !**/.vscode/launch.json
 .vscode/launch.json
 
+coverage
