@@ -1,5 +1,5 @@
 # Memory Analyzer for Java (Visual Studio Code extension)
-Visualize object memory allocations and duplicates line-by-line.
+Visualize Java object memory allocations and duplicates line-by-line.
 
 **IMPORTANT:** In the current version, this tool provides **only the data visualization** of the output of an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser) and **does not analyze the application by itself**.
 
@@ -10,7 +10,7 @@ Visualize object memory allocations and duplicates line-by-line.
 - Highlight lines that allocated memory on the heap at runtime.
 - Display how many objects, what types and how much memory has each line allocated.
 - Aggregate line data to see a method and class total allocation size.
-- Show table containing detailed information with interactive links.
+- Tables containing detailed information with interactive links.
 - Trace duplicates to their sources.
 - Customize highlight color settings.
 
@@ -21,7 +21,7 @@ Before using, ensure that [Language Support for Java(TM) by Red Hat](https://mar
 
 ## How to install
 ### Obtaining VSIX file
-In order to install the extension, you have to acquire VSIX (Visual Studio extension installer) file. You can either create it from source code yourself, or download it from [release folder](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/release?ref_type=heads), where is the latest build.
+In order to install the extension, you have to acquire VSIX (Visual Studio extension installer) file. You can either create it from this source code yourself, or download it from [release folder](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/release?ref_type=heads), where is the latest build.
 
 ### Creating VSIX from the source code
 If you have decided to download the VSIX file from the [release folder](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/release?ref_type=heads), **skip this section**.
@@ -61,7 +61,7 @@ If you have the VSIX file ready, you can install the extension inside Visual Stu
 <img src="https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/install.gif?ref_type=heads" width=50% height=50%>
 
 ## How to use 
-In order to visualize allocation data, you have to provide JSON file that can be generated with an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser). If you have the data ready, you can do the following:
+In order to visualize allocation data, you have to provide a JSON file that can be generated with an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser). If you have the data ready, you can do the following:
 
 1. Open your Java project in Visual Studio Code and wait for Java symbols to fully load (indicated by **Java: ready** in the bottom status bar).
 2. Run command **Memory Analyzer: Load JSON file**.
