@@ -7,6 +7,6 @@ out
 **/target/*
 **/.vscode/*
 !**/.vscode/launch.json
-.vscode/launch.json
+!.vscode/*
 
 coverage

@@ -133,6 +133,6 @@ Each demo in this repository contains configuration `.vscode/launch.json` that c
 ## Known Issues and limitations
 - The format of JSON file is same as an output of the [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser), no other JSON format is supported.
 - The visualization can only show as much data as it is provided with the JSON file. 
-- Extension does not actually detect the keyword responsible for memory allocation (such as `new`), it only highlights lines according to the provided file.
+- Extension does not actually detect the keyword responsible for memory allocation (such as `new`), as it only highlights lines according to the provided file.
 - No support for visualization of nested classes, nested methods and enumerations.
 - If you try to run **Load JSON file** without the Java language support fully loaded (indicated by **Java: ready**), some files may be missing allocation data. If this problem persists, the best solution is to restart the Visual Studio Code.
