@@ -1,7 +1,6 @@
 ﻿node_modules
 .vscode-test
 out
-.vscode-test.mjs
 
 **/verbose.log
 **/target/*
