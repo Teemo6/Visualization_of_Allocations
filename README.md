@@ -4,7 +4,7 @@ Visualize Java object memory allocations and duplicates line-by-line.
 **IMPORTANT:** In the current version, this tool provides **only the data visualization** of the output of an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser) and **does not analyze the application by itself**.
 
 ## Features
-![Extension demo](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/demo.gif?ref_type=heads)
+![Extension demo|300](readme%2Fdemo.gif)
 
 - Visualize data provided by an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser).
 - Highlight lines that allocated memory on the heap at runtime.
@@ -21,10 +21,10 @@ Before using, ensure that [Language Support for Java(TM) by Red Hat](https://mar
 
 ## How to install
 ### Obtaining VSIX file
-In order to install the extension, you have to acquire VSIX (Visual Studio extension installer) file. You can either create it from this source code yourself, or download it from [release folder](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/release?ref_type=heads), where is the latest build.
+In order to install the extension, you have to acquire VSIX (Visual Studio extension installer) file. You can either create it from this source code yourself, or download it from [release folder](https://github.com/Teemo6/Visualization_of_Allocations/tree/main/release), where is the latest build.
 
 ### Creating VSIX from the source code
-If you have decided to download the VSIX file from the [release folder](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/release?ref_type=heads), **skip this section**.
+If you have decided to download the VSIX file from the [release folder](https://github.com/Teemo6/Visualization_of_Allocations/tree/main/release), **skip this section**.
 
 To build the souce code yourself, you will need a [Node.js](https://nodejs.org/en) with `npm` (node package manager) installed on your machine. If you have `npm` ready, follow these steps:
 
@@ -58,7 +58,7 @@ If you have the VSIX file ready, you can install the extension inside Visual Stu
 3. Click **Views and more actions...**
 4. Select **Install from VSIX...**
 
-<img src="https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/install.gif?ref_type=heads" width=50% height=50%>
+![Extension installation|200](readme%2Finstall.gif)
 
 ## How to use 
 In order to visualize allocation data, you have to provide a JSON file that can be generated with an [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser). If you have the data ready, you can do the following:
@@ -75,11 +75,11 @@ If you get prompted with a warning **Found no Java symbols in files**, Java lang
 - To quickly navigate, search for **Memory Analyzer**.
 
 ## How to obtain JSON file
-This repository includes [demo applications](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/demo?ref_type=heads), each featuring pre-generated `data.json` that you can use for a quick demonstration of this extension.
+This repository includes [demo applications](https://github.com/Teemo6/Visualization_of_Allocations/tree/main/demo), each featuring pre-generated `data.json` that you can use for a quick demonstration of this extension.
 
 In order to create `data.json` yourself, you will need to build the [external Memory Analyzer application](https://gitlab.kiv.zcu.cz/lipka/java-memory-allocation-analyser) using [Maven](https://maven.apache.org/). Instructions are available in the project repository.
 
-To build the [demo applications](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/tree/main/demo?ref_type=heads), you can call the following command from root folder of this repository, which will create a JAR file `<demoApp>/target/app.jar` for each demo respectively:
+To build the [demo applications](https://github.com/Teemo6/Visualization_of_Allocations/tree/main/demo), you can call the following command from root folder of this repository, which will create a JAR file `<demoApp>/target/app.jar` for each demo respectively:
 
 ```
 mvn -f demo clean install
@@ -124,7 +124,7 @@ Each demo in this repository contains configuration `.vscode/launch.json` that c
 - All colors accept a string in the [CSS color format](https://www.w3schools.com/css/css_colors.asp).
 - If you have the visualization toggled on, the changes can be seen immediately.
 
-![Color change](https://gitlab.kiv.zcu.cz/lipka/visualisation-of-allocations/-/raw/main/readme/color.gif?ref_type=heads)
+![Extension color change|300](readme%2Fcolor.gif)
 
 ### Highlight font settings
 - `java-memory-analyzer.highlightFont.bold`: turn on to have bold highlight font
